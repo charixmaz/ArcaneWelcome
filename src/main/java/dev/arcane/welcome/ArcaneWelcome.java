@@ -20,7 +20,7 @@ public final class ArcaneWelcome extends JavaPlugin implements Listener, Command
     private final ExecutorService worker = Executors.newSingleThreadExecutor();
     private final Map<UUID, Store.Arrival> arrivals = new HashMap<>();
     private final Map<UUID, Trial> trials = new HashMap<>();
-    private final Map<UUID, TextDisplay> holograms = new HashMap<>();
+    private final Set<UUID> welcomeTitles = new HashSet<>();
     private final Set<UUID> busy = new HashSet<>();
     private final Set<String> announced = new HashSet<>();
     private volatile boolean stopping;
@@ -29,7 +29,7 @@ public final class ArcaneWelcome extends JavaPlugin implements Listener, Command
     private YamlConfiguration messages;
     private record Trial(String id, String name, long starts, long ends) {}
     private record Settings(long delay, long duration, String word, String command,
-                            boolean hologram, long hologramDuration, double height, String text,
+                            boolean titleEnabled, long fadeIn, long stay, long fadeOut, String titleText, String subtitleText,
                             String testName, long testDelay, boolean testPay, String rewardDisplay) {}
 
     @Override public void onEnable() {
@@ -53,6 +53,7 @@ public final class ArcaneWelcome extends JavaPlugin implements Listener, Command
         var bundled=new YamlConfiguration();
         try(var reader=new java.io.InputStreamReader(Objects.requireNonNull(getResource("messages.yml")),java.nio.charset.StandardCharsets.UTF_8)) {bundled.load(reader);}
         Map<String,String> legacy=Map.ofEntries(
+            Map.entry("hologram-preview","&fShowing your private welcome hologram."),
             Map.entry("announcement","&d{newcomer} is new! &fType welcome {newcomer} to welcome them."),
             Map.entry("reward","&aWelcome reward command sent. Thanks for welcoming {newcomer}!"),
             Map.entry("already","&eYou already welcomed this player."),
@@ -80,6 +81,14 @@ public final class ArcaneWelcome extends JavaPlugin implements Listener, Command
             config.set("hologram.text","&f&lWelcome&r &bto the server!");configChanged=true;
         }
         if(!config.contains("reward.display-amount")) {config.set("reward.display-amount","$50");configChanged=true;}
+        var defaults=new YamlConfiguration();
+        try(var reader=new java.io.InputStreamReader(Objects.requireNonNull(getResource("config.yml")),java.nio.charset.StandardCharsets.UTF_8)) {defaults.load(reader);}
+        for(String key:defaults.getKeys(true)) {
+            if(key.startsWith("title.") && !defaults.isConfigurationSection(key) && !config.contains(key)) {
+                config.set(key,key.equals("title.enabled")?config.getBoolean("hologram.enabled",true):defaults.get(key));
+                configChanged=true;
+            }
+        }
         if(configChanged)config.save(configFile);
     }
     private long seconds(YamlConfiguration c,String path,long min,long max) {
@@ -91,12 +100,10 @@ public final class ArcaneWelcome extends JavaPlugin implements Listener, Command
         String word=c.getString("welcome.word","welcome");
         String command=c.getString("reward.command","").strip();
         String test=c.getString("test.name","ArcaneTest");
-        double height=c.getDouble("hologram.height",2.5);
         if(!word.matches("[A-Za-z]+") || !test.matches("[A-Za-z0-9_]{1,16}") || command.isBlank()
-                || command.startsWith("/") || command.contains("\n") || command.contains("\r")
-                || !Double.isFinite(height) || height<0 || height>20) throw new IllegalArgumentException("Check welcome.word, test.name, reward.command and hologram.height");
+                || command.startsWith("/") || command.contains("\n") || command.contains("\r")) throw new IllegalArgumentException("Check welcome.word, test.name, reward.command");
         Settings candidate=new Settings(seconds(c,"welcome.delay-seconds",0,86400),seconds(c,"welcome.duration-seconds",1,86400),word,command,
-                c.getBoolean("hologram.enabled",true),seconds(c,"hologram.duration-seconds",1,3600),height,c.getString("hologram.text","&f&lWelcome&r &bto the server!"),
+                c.getBoolean("title.enabled",true),seconds(c,"title.fade-in-ticks",0,1200),seconds(c,"title.stay-ticks",1,1200),seconds(c,"title.fade-out-ticks",0,1200),c.getString("title.text","&f&lWelcome"),c.getString("title.subtitle","&bto the server!"),
                 test,seconds(c,"test.delay-seconds",0,86400),c.getBoolean("test.pay-rewards",true),c.getString("reward.display-amount","$50"));
         settings=candidate; messages=m;
     }
@@ -120,7 +127,7 @@ public final class ArcaneWelcome extends JavaPlugin implements Listener, Command
         });
     }
     @EventHandler public void quit(PlayerQuitEvent e) {
-        UUID id=e.getPlayer().getUniqueId(); arrivals.remove(id); trials.remove(id); removeHologram(id);
+        UUID id=e.getPlayer().getUniqueId(); arrivals.remove(id); trials.remove(id); removeWelcomeTitle(id);
     }
     @EventHandler(priority=EventPriority.MONITOR,ignoreCancelled=true)
     public void chat(AsyncChatEvent e) {
@@ -134,13 +141,13 @@ public final class ArcaneWelcome extends JavaPlugin implements Listener, Command
         for(var entry:arrivals.entrySet()) {
             var a=entry.getValue(); Player p=Bukkit.getPlayer(entry.getKey());
             if(p!=null && time>=a.starts() && time<a.ends() && announced.add(a.id())) {
-                Bukkit.broadcastMessage(msg("announcement",a.name())); showHologram(p);
+                Bukkit.broadcastMessage(msg("announcement",a.name())); showWelcomeTitle(p);
             }
         }
         for(var entry:trials.entrySet()) {
             Trial t=entry.getValue(); Player p=Bukkit.getPlayer(entry.getKey());
             if(p!=null && time>=t.starts && time<t.ends && announced.add(t.id)) {
-                send(p,"announcement",t.name); showHologram(p);
+                send(p,"announcement",t.name); showWelcomeTitle(p);
             }
         }
     }
@@ -180,22 +187,23 @@ public final class ArcaneWelcome extends JavaPlugin implements Listener, Command
             }
         });
     }
-    private void removeHologram(UUID id) { TextDisplay d=holograms.remove(id); if(d!=null)d.remove(); }
-    private void showHologram(Player p) {
-        showHologram(p,false);
+    private void removeWelcomeTitle(UUID id) {
+        if(welcomeTitles.remove(id)) {
+            Player p=Bukkit.getPlayer(id);if(p!=null)p.clearTitle();
+        }
     }
-    private void showHologram(Player p,boolean preview) {
-        if(!preview && !settings.hologram)return;
-        removeHologram(p.getUniqueId());
-        TextDisplay display=p.getWorld().spawn(p.getLocation().add(0,settings.height,0),TextDisplay.class,d -> {
-            d.setVisibleByDefault(false); d.setPersistent(false);
-            d.setBillboard(Display.Billboard.CENTER);
-            d.text(LegacyComponentSerializer.legacyAmpersand().deserialize(settings.text)); d.setShadowed(true);
-        });
-        p.showEntity(this,display); holograms.put(p.getUniqueId(),display);
-        Bukkit.getScheduler().runTaskLater(this,() -> {
-            if(holograms.remove(p.getUniqueId(),display))display.remove();
-        },settings.hologramDuration*20);
+    private void showWelcomeTitle(Player p) { showWelcomeTitle(p,false); }
+    private void showWelcomeTitle(Player p,boolean preview) {
+        if(!preview && !settings.titleEnabled)return;
+        var serializer=LegacyComponentSerializer.legacyAmpersand();
+        var times=net.kyori.adventure.title.Title.Times.times(
+                java.time.Duration.ofMillis(settings.fadeIn*50),
+                java.time.Duration.ofMillis(settings.stay*50),
+                java.time.Duration.ofMillis(settings.fadeOut*50));
+        p.showTitle(net.kyori.adventure.title.Title.title(
+                serializer.deserialize(settings.titleText),
+                serializer.deserialize(settings.subtitleText),times));
+        welcomeTitles.add(p.getUniqueId());
     }
     @Override public boolean onCommand(CommandSender sender,Command command,String label,String[] args) {
         if(!sender.hasPermission("arcanew.admin")) {sender.sendMessage(msg("no-permission",""));return true;}
@@ -205,8 +213,8 @@ public final class ArcaneWelcome extends JavaPlugin implements Listener, Command
             return true;
         }
         if(sender instanceof Player p && args.length==2 && args[0].equalsIgnoreCase("test")) {
-            if(args[1].equalsIgnoreCase("hologram")) {showHologram(p,true);send(p,"hologram-preview","");return true;}
-            if(args[1].equalsIgnoreCase("stop")) {trials.remove(p.getUniqueId());removeHologram(p.getUniqueId());send(p,"test-stopped","");return true;}
+            if(args[1].equalsIgnoreCase("hologram")) {showWelcomeTitle(p,true);send(p,"hologram-preview","");return true;}
+            if(args[1].equalsIgnoreCase("stop")) {trials.remove(p.getUniqueId());removeWelcomeTitle(p.getUniqueId());send(p,"test-stopped","");return true;}
             if(args[1].equalsIgnoreCase("join")) {
                 long starts=now()+settings.testDelay*1000;
                 trials.put(p.getUniqueId(),new Trial("test:"+UUID.randomUUID(),settings.testName,starts,starts+settings.duration*1000));
@@ -217,7 +225,7 @@ public final class ArcaneWelcome extends JavaPlugin implements Listener, Command
     }
     @Override public void onDisable() {
         stopping=true;
-        holograms.values().forEach(Entity::remove); holograms.clear();
+        for(UUID id:new HashSet<>(welcomeTitles))removeWelcomeTitle(id);
         // Close is queued behind all already-submitted database writes.
         worker.submit(() -> {if(store!=null)try{store.close();}catch(Exception e){getLogger().severe(e.toString());}});
         worker.shutdown();

@@ -12,12 +12,14 @@ reward:
   command: 'eco give {player} 50'
   # Chat label only: keep this in sync with the amount in your reward command.
   display-amount: '$50'
-hologram:
+# Private screen title. Timing is in ticks: 20 ticks = 1 second.
+title:
   enabled: true
-  duration-seconds: 30
-  height: 2.5
-  # &f white, &l bold, &r reset bold, &b cyan. Preview: /arcanew test hologram
-  text: '&f&lWelcome&r &bto the server!'
+  text: '&f&lWelcome'
+  subtitle: '&bto the server!'
+  fade-in-ticks: 10
+  stay-ticks: 40
+  fade-out-ticks: 10
 test:
   # Admin-only fake newcomer; no real first-join records are changed.
   name: ArcaneTest
