@@ -11,11 +11,10 @@ jobs:
         with:
           distribution: temurin
           java-version: '25'
-      - uses: gradle/actions/setup-gradle@v4
-        with:
-          gradle-version: '9.2.1'
-      - run: gradle --no-daemon clean build
+          cache: maven
+      - run: mvn --batch-mode --no-transfer-progress clean verify
       - uses: actions/upload-artifact@v4
         with:
           name: ArcaneWelcome
-          path: build/libs/ArcaneWelcome-0.1.0.jar
+          path: target/ArcaneWelcome-0.1.0.jar
+          if-no-files-found: error

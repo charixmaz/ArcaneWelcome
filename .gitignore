@@ -1,6 +1,6 @@
-.gradle/
-build/
+target/
 *.db
 *.db-wal
 *.db-shm
 .idea/
+*.iml

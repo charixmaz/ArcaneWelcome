@@ -5,12 +5,12 @@
 - All shipped YAML files parsed successfully.
 
 ## Not yet run
-- Java compilation and Gradle/JUnit: this workspace has Java 17 runtime only, no javac or Gradle. Paper 26.x development needs JDK 25.
+- Maven compilation/JUnit: requires JDK 25. Previous Gradle CI passed; Maven migration requires a fresh CI run.
 - Live Paper server tests and economy integration.
-- GitHub Actions: configured, but no remote repository exists yet.
+- GitHub Actions: Maven build and artifact upload configured.
 
 ## Required live acceptance check
-1. Build with JDK 25 and Gradle 9.2.1; require successful JUnit and bundled jar generation.
+1. Run `mvn clean verify` with JDK 25 and Maven 3.9+; require successful JUnit and bundled jar generation.
 2. Start Paper 26.x with the economy plugin; configure its console money-grant command.
 3. As admin, `/arcanew test join`: private hologram appears. Another observer must not see it.
 4. Type `Welcome ArcaneTest`; compare balance before/after for exactly the configured reward.
