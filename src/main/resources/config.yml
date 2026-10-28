@@ -1,0 +1,24 @@
+# All times are seconds. Reload with /arcanew reload.
+# Changes apply to future arrivals; existing welcome windows keep their timestamps.
+welcome:
+  delay-seconds: 30
+  duration-seconds: 300
+  # Exact phrase + full username, ignoring capitalization. Optional @ is accepted.
+  word: welcome
+reward:
+  # Console commands WITHOUT /. {player} is the person doing the welcoming.
+  # Requires an installed economy plugin providing this command.
+  # /pay normally needs a player sender: use your economy's console grant command.
+  command: 'eco give {player} 50'
+hologram:
+  enabled: true
+  duration-seconds: 30
+  height: 2.5
+  text: '&dWelcome to the server!'
+test:
+  # Admin-only fake newcomer; no real first-join records are changed.
+  name: ArcaneTest
+  # Immediate preview; normal arrivals still wait 30 seconds.
+  delay-seconds: 0
+  # True means the test dispatches the REAL reward command.
+  pay-rewards: true
