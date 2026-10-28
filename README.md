@@ -23,7 +23,8 @@ As an operator or a player with `arcanew.admin`:
 2. Type `welcome ArcaneTest` in normal chat. Your configured REAL economy command runs.
 3. Check your balance with your economy plugin.
 4. Repeat `welcome ArcaneTest`: duplicate notification, no second command.
-5. `/arcanew test stop` ends the test. A new test join creates a fresh test session.
+5. `/arcanew test hologram` previews only your private hologram immediately, even when normal holograms are disabled. It creates no newcomer or payment claim.
+6. `/arcanew test stop` ends the test. A new test join creates a fresh test session.
 Test sessions are private, temporary, and separate from genuine newcomer records. Setting `test.pay-rewards: false` performs a dry run. Test names take precedence over real players with that name for the tester only.
 
 ## Persistence and crash behavior
@@ -36,3 +37,8 @@ JUnit covers exact chat matching, persistence after reopening, returning-player 
 
 ## Repository
 https://github.com/charixmaz/ArcaneWelcome
+
+## Styling
+`messages.yml` controls the bold yellow `[Arcane]` prefix and white chat text. `{amount}` uses `reward.display-amount` (default `$50`), styled bold green; keep that label in sync with your console reward command. Command dispatch does not verify actual payment.
+`hologram.text` defaults to `&f&lWelcome&r &bto the server!` (bold white Welcome, normal cyan continuation). Edit colors/text and use `/arcanew reload`, then `/arcanew test hologram`.
+On startup, unchanged original message/hologram defaults are upgraded to the new style; customized values are preserved. Messages printed by your economy plugin use that plugin’s own configuration.

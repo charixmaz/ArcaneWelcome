@@ -30,12 +30,12 @@ public final class ArcaneWelcome extends JavaPlugin implements Listener, Command
     private record Trial(String id, String name, long starts, long ends) {}
     private record Settings(long delay, long duration, String word, String command,
                             boolean hologram, long hologramDuration, double height, String text,
-                            String testName, long testDelay, boolean testPay) {}
+                            String testName, long testDelay, boolean testPay, String rewardDisplay) {}
 
     @Override public void onEnable() {
         saveDefaultConfig();
         if (!new File(getDataFolder(), "messages.yml").exists()) saveResource("messages.yml", false);
-        try { loadSettings(); }
+        try { upgradeDefaultStyle(); loadSettings(); }
         catch (Exception e) { getLogger().severe("Invalid configuration: " + e.getMessage()); getServer().getPluginManager().disablePlugin(this); return; }
         // Initial open happens once before accepting events; all subsequent I/O uses the worker.
         try { store = new Store(getDataFolder().toPath().resolve("welcome.db")); }
@@ -44,6 +44,43 @@ public final class ArcaneWelcome extends JavaPlugin implements Listener, Command
         Objects.requireNonNull(getCommand("arcanew")).setExecutor(this);
         for (Player p : Bukkit.getOnlinePlayers()) register(p, false);
         Bukkit.getScheduler().runTaskTimer(this,this::tick,20,20);
+    }
+
+    // Replace only shipped legacy defaults; preserve owner-customized text.
+    private void upgradeDefaultStyle() throws Exception {
+        File file=new File(getDataFolder(),"messages.yml");
+        var current=YamlConfiguration.loadConfiguration(file);
+        var bundled=new YamlConfiguration();
+        try(var reader=new java.io.InputStreamReader(Objects.requireNonNull(getResource("messages.yml")),java.nio.charset.StandardCharsets.UTF_8)) {bundled.load(reader);}
+        Map<String,String> legacy=Map.ofEntries(
+            Map.entry("announcement","&d{newcomer} is new! &fType welcome {newcomer} to welcome them."),
+            Map.entry("reward","&aWelcome reward command sent. Thanks for welcoming {newcomer}!"),
+            Map.entry("already","&eYou already welcomed this player."),
+            Map.entry("self","&eYou cannot welcome yourself."),
+            Map.entry("closed","&eThat player is not currently accepting welcomes."),
+            Map.entry("failed","&cReward could not be dispatched. Contact an administrator."),
+            Map.entry("busy","&eYour previous welcome is still being processed."),
+            Map.entry("reloaded","&aArcaneWelcome configuration reloaded."),
+            Map.entry("invalid-config","&cInvalid configuration; previous settings remain active. Check the console."),
+            Map.entry("test-started","&dTest started. Type welcome {newcomer}. Real rewards: {paid}."),
+            Map.entry("test-stopped","&eYour test session ended."),
+            Map.entry("no-permission","&cYou do not have permission."),
+            Map.entry("usage","&e/arcanew reload | /arcanew test join | /arcanew test stop"));
+        boolean changed=false;
+        for(String key:bundled.getKeys(false)) {
+            if(!current.contains(key) || Objects.equals(current.getString(key),legacy.get(key))) {
+                current.set(key,bundled.getString(key));changed=true;
+            }
+        }
+        if(changed)current.save(file);
+        File configFile=new File(getDataFolder(),"config.yml");
+        var config=YamlConfiguration.loadConfiguration(configFile);
+        boolean configChanged=false;
+        if("&dWelcome to the server!".equals(config.getString("hologram.text"))) {
+            config.set("hologram.text","&f&lWelcome&r &bto the server!");configChanged=true;
+        }
+        if(!config.contains("reward.display-amount")) {config.set("reward.display-amount","$50");configChanged=true;}
+        if(configChanged)config.save(configFile);
     }
     private long seconds(YamlConfiguration c,String path,long min,long max) {
         long v=c.getLong(path); if(v<min || v>max) throw new IllegalArgumentException(path+" must be "+min+".."+max); return v;
@@ -59,13 +96,13 @@ public final class ArcaneWelcome extends JavaPlugin implements Listener, Command
                 || command.startsWith("/") || command.contains("\n") || command.contains("\r")
                 || !Double.isFinite(height) || height<0 || height>20) throw new IllegalArgumentException("Check welcome.word, test.name, reward.command and hologram.height");
         Settings candidate=new Settings(seconds(c,"welcome.delay-seconds",0,86400),seconds(c,"welcome.duration-seconds",1,86400),word,command,
-                c.getBoolean("hologram.enabled",true),seconds(c,"hologram.duration-seconds",1,3600),height,c.getString("hologram.text","Welcome to the server!"),
-                test,seconds(c,"test.delay-seconds",0,86400),c.getBoolean("test.pay-rewards",true));
+                c.getBoolean("hologram.enabled",true),seconds(c,"hologram.duration-seconds",1,3600),height,c.getString("hologram.text","&f&lWelcome&r &bto the server!"),
+                test,seconds(c,"test.delay-seconds",0,86400),c.getBoolean("test.pay-rewards",true),c.getString("reward.display-amount","$50"));
         settings=candidate; messages=m;
     }
     private static long now() { return System.currentTimeMillis(); }
     @SuppressWarnings("deprecation") private String color(String value) { return ChatColor.translateAlternateColorCodes('&',value); }
-    private String msg(String key,String name) { return color(messages.getString(key,key).replace("{newcomer}",name).replace("{paid}",String.valueOf(settings.testPay))); }
+    private String msg(String key,String name) { return color((messages.getString("prefix","&e&l[Arcane]&r &f")+messages.getString(key,key)).replace("{amount}",settings.rewardDisplay).replace("{newcomer}",name).replace("{paid}",String.valueOf(settings.testPay))); }
     private void send(Player p,String key,String name) { p.sendMessage(msg(key,name)); }
     private <T> void io(Callable<T> job,Consumer<T> done) {
         if(stopping) return;
@@ -145,7 +182,10 @@ public final class ArcaneWelcome extends JavaPlugin implements Listener, Command
     }
     private void removeHologram(UUID id) { TextDisplay d=holograms.remove(id); if(d!=null)d.remove(); }
     private void showHologram(Player p) {
-        if(!settings.hologram)return;
+        showHologram(p,false);
+    }
+    private void showHologram(Player p,boolean preview) {
+        if(!preview && !settings.hologram)return;
         removeHologram(p.getUniqueId());
         TextDisplay display=p.getWorld().spawn(p.getLocation().add(0,settings.height,0),TextDisplay.class,d -> {
             d.setVisibleByDefault(false); d.setPersistent(false);
@@ -165,6 +205,7 @@ public final class ArcaneWelcome extends JavaPlugin implements Listener, Command
             return true;
         }
         if(sender instanceof Player p && args.length==2 && args[0].equalsIgnoreCase("test")) {
+            if(args[1].equalsIgnoreCase("hologram")) {showHologram(p,true);send(p,"hologram-preview","");return true;}
             if(args[1].equalsIgnoreCase("stop")) {trials.remove(p.getUniqueId());removeHologram(p.getUniqueId());send(p,"test-stopped","");return true;}
             if(args[1].equalsIgnoreCase("join")) {
                 long starts=now()+settings.testDelay*1000;

@@ -6,7 +6,7 @@ description: Reward friendly first-join welcomes in normal chat.
 commands:
   arcanew:
     description: ArcaneWelcome administration
-    usage: /arcanew <reload|test join|test stop>
+    usage: /arcanew <reload|test join|test hologram|test stop>
     permission: arcanew.admin
 permissions:
   arcanew.admin:

@@ -10,11 +10,14 @@ reward:
   # Requires an installed economy plugin providing this command.
   # /pay normally needs a player sender: use your economy's console grant command.
   command: 'eco give {player} 50'
+  # Chat label only: keep this in sync with the amount in your reward command.
+  display-amount: '$50'
 hologram:
   enabled: true
   duration-seconds: 30
   height: 2.5
-  text: '&dWelcome to the server!'
+  # &f white, &l bold, &r reset bold, &b cyan. Preview: /arcanew test hologram
+  text: '&f&lWelcome&r &bto the server!'
 test:
   # Admin-only fake newcomer; no real first-join records are changed.
   name: ArcaneTest
