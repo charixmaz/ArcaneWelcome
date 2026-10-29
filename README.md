@@ -44,3 +44,31 @@ https://github.com/charixmaz/ArcaneWelcome
 On startup, unchanged original message/hologram defaults are upgraded to the new style; customized values are preserved. Messages printed by your economy plugin use that plugin’s own configuration.
 
 Existing installations receive missing `title` settings automatically on startup. Old `hologram` settings are unused; the old enabled setting is carried over on first migration. Customize the new `title` section for text and timing.
+
+## Automatic chat quizzes
+`quizzes.yml` contains all quiz settings and questions. The default is a quiz 10 minutes after startup and 10 minutes after each round ends, with 30 seconds to answer. Set `quiz.interval-seconds: 360` for six minutes. Only the first correct answer accepted by the server wins; other correct answers receive no reward. A round closes before its reward reservation/payment begins, including when several players answer at nearly the same time.
+
+Players answer in normal chat. Answers ignore capitalization and repeated spaces but otherwise must match one item in `answers`. “Whale” does not match “Blue whale”. Timeout reveals the first listed answer. Trivia and generated math mix randomly; division uses whole-number answers. Immediate repeats are avoided where the available question pool/range permits it.
+
+Minimal owner question:
+```yaml
+questions:
+  biggest-animal:
+    question: 'What is the largest animal in the world?'
+    answers:
+      - 'Blue whale'
+```
+
+Reward defaults to `eco give {player} 100`; `quiz.reward-display` is only its chat label. The economy command must exist and support console execution. As with welcomes, dispatch cannot prove payment, and a crash after saving a reservation can leave an unpaid winner for manual review. Failed/uncertain payments are never automatically retried. Active rounds are cancelled on reload/restart; no prior answers are replayed.
+
+Optional settings: minimum online players, category toggles, per-difficulty rewards, and winner cooldown measured in following rounds (disabled by default). Admins can start tests even when automatic quizzes are disabled or the minimum online count is unmet. Manual tests pay the REAL configured reward.
+
+Admin commands (permission `arcanew.admin`):
+- `/arcanew test quiz` or `/arcanew quiz start`: start one round now; an existing round is not replaced.
+- `/arcanew quiz stop`: stop the active round. Automatic scheduling resumes after the interval.
+- `/arcanew quiz skip`: stop the active round and immediately show another question.
+- `/arcanew reload`: validate all config files; on success cancel the current quiz and reset its interval. Invalid config keeps previous runtime settings.
+
+Quiz announcements use configurable `quiz-*` entries in `messages.yml`, with the bold yellow Arcane prefix, white text, and bold green money. New message keys are added on startup without overwriting customized text.
+
+The screen welcome now supports `{player}` in both `title.text` and `title.subtitle`. The default is `&f&lWelcome {player}` with `&bto the server!` beneath it. Existing unchanged defaults migrate automatically; customized titles remain intact.

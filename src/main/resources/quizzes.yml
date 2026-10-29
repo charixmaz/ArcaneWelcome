@@ -1,0 +1,65 @@
+# Reload all settings/questions with /arcanew reload.
+# Only the FIRST correct answer wins. Answers are normal chat, not commands.
+quiz:
+  enabled: true
+  # 360 = 6 minutes, 600 = 10 minutes. Wait this long after a round ends.
+  interval-seconds: 600
+  answer-time-seconds: 30
+  minimum-online-players: 1
+  # 0 disables this; 1 makes the last winner sit out the following round.
+  winner-cooldown-rounds: 0
+  # Console command without /. This must be provided by your economy plugin.
+  reward-command: 'eco give {player} 100'
+  # Display label only; keep it in sync with the command above.
+  reward-display: '$100'
+
+math:
+  enabled: true
+  # Percent of rounds using generated math instead of trivia.
+  chance-percent: 40
+  minimum-number: 1
+  maximum-number: 50
+  # Division generates a nonzero divisor and a whole-number answer.
+  # Division's displayed dividend may be larger than maximum-number.
+  operations: [addition, subtraction, multiplication, division]
+
+# Optional categories: set false to exclude a category's questions.
+categories:
+  general: true
+  geography: true
+  minecraft: true
+
+# Optional: only applies to questions specifying the matching difficulty.
+# Questions without a difficulty use the default reward above.
+difficulty-rewards:
+  easy:
+    command: 'eco give {player} 50'
+    display: '$50'
+  medium:
+    command: 'eco give {player} 100'
+    display: '$100'
+  hard:
+    command: 'eco give {player} 200'
+    display: '$200'
+
+# Add any unique ID. A question and an answers list are all you need.
+# Only listed answers count (case and extra spaces are ignored).
+# The first answer is revealed when time runs out.
+questions:
+  usa-capital:
+    question: 'What is the capital of the USA?'
+    category: geography
+    answers:
+      - 'Washington DC'
+      - 'Washington D.C.'
+      - 'Washington, D.C.'
+  biggest-animal:
+    question: 'What is the largest animal in the world?'
+    category: general
+    answers:
+      - 'Blue whale'
+  minecraft-portal:
+    question: 'Which block forms the frame of a Nether portal?'
+    category: minecraft
+    answers:
+      - 'Obsidian'

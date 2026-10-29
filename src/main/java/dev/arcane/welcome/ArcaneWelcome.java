@@ -26,6 +26,7 @@ public final class ArcaneWelcome extends JavaPlugin implements Listener, Command
     private volatile boolean stopping;
     private Store store;
     private Settings settings;
+    private final QuizManager quizzes = new QuizManager(this);
     private YamlConfiguration messages;
     private record Trial(String id, String name, long starts, long ends) {}
     private record Settings(long delay, long duration, String word, String command,
@@ -35,6 +36,7 @@ public final class ArcaneWelcome extends JavaPlugin implements Listener, Command
     @Override public void onEnable() {
         saveDefaultConfig();
         if (!new File(getDataFolder(), "messages.yml").exists()) saveResource("messages.yml", false);
+        if (!new File(getDataFolder(), "quizzes.yml").exists()) saveResource("quizzes.yml", false);
         try { upgradeDefaultStyle(); loadSettings(); }
         catch (Exception e) { getLogger().severe("Invalid configuration: " + e.getMessage()); getServer().getPluginManager().disablePlugin(this); return; }
         // Initial open happens once before accepting events; all subsequent I/O uses the worker.
@@ -53,6 +55,7 @@ public final class ArcaneWelcome extends JavaPlugin implements Listener, Command
         var bundled=new YamlConfiguration();
         try(var reader=new java.io.InputStreamReader(Objects.requireNonNull(getResource("messages.yml")),java.nio.charset.StandardCharsets.UTF_8)) {bundled.load(reader);}
         Map<String,String> legacy=Map.ofEntries(
+            Map.entry("usage", "&f/arcanew reload | /arcanew test join | /arcanew test hologram | /arcanew test stop"),
             Map.entry("hologram-preview","&fShowing your private welcome hologram."),
             Map.entry("announcement","&d{newcomer} is new! &fType welcome {newcomer} to welcome them."),
             Map.entry("reward","&aWelcome reward command sent. Thanks for welcoming {newcomer}!"),
@@ -65,8 +68,7 @@ public final class ArcaneWelcome extends JavaPlugin implements Listener, Command
             Map.entry("invalid-config","&cInvalid configuration; previous settings remain active. Check the console."),
             Map.entry("test-started","&dTest started. Type welcome {newcomer}. Real rewards: {paid}."),
             Map.entry("test-stopped","&eYour test session ended."),
-            Map.entry("no-permission","&cYou do not have permission."),
-            Map.entry("usage","&e/arcanew reload | /arcanew test join | /arcanew test stop"));
+            Map.entry("no-permission","&cYou do not have permission."));
         boolean changed=false;
         for(String key:bundled.getKeys(false)) {
             if(!current.contains(key) || Objects.equals(current.getString(key),legacy.get(key))) {
@@ -89,6 +91,7 @@ public final class ArcaneWelcome extends JavaPlugin implements Listener, Command
                 configChanged=true;
             }
         }
+        if("&f&lWelcome".equals(config.getString("title.text"))) {config.set("title.text","&f&lWelcome {player}");configChanged=true;}
         if(configChanged)config.save(configFile);
     }
     private long seconds(YamlConfiguration c,String path,long min,long max) {
@@ -103,9 +106,15 @@ public final class ArcaneWelcome extends JavaPlugin implements Listener, Command
         if(!word.matches("[A-Za-z]+") || !test.matches("[A-Za-z0-9_]{1,16}") || command.isBlank()
                 || command.startsWith("/") || command.contains("\n") || command.contains("\r")) throw new IllegalArgumentException("Check welcome.word, test.name, reward.command");
         Settings candidate=new Settings(seconds(c,"welcome.delay-seconds",0,86400),seconds(c,"welcome.duration-seconds",1,86400),word,command,
-                c.getBoolean("title.enabled",true),seconds(c,"title.fade-in-ticks",0,1200),seconds(c,"title.stay-ticks",1,1200),seconds(c,"title.fade-out-ticks",0,1200),c.getString("title.text","&f&lWelcome"),c.getString("title.subtitle","&bto the server!"),
+                c.getBoolean("title.enabled",true),seconds(c,"title.fade-in-ticks",0,1200),seconds(c,"title.stay-ticks",1,1200),seconds(c,"title.fade-out-ticks",0,1200),c.getString("title.text","&f&lWelcome {player}"),c.getString("title.subtitle","&bto the server!"),
                 test,seconds(c,"test.delay-seconds",0,86400),c.getBoolean("test.pay-rewards",true),c.getString("reward.display-amount","$50"));
+        // Parse all files before committing any runtime changes; bad reload keeps prior settings.
+        QuizSettings quizCandidate=QuizSettings.load(new File(getDataFolder(),"quizzes.yml"));
+        var bundled=new YamlConfiguration();
+        try(var reader=new java.io.InputStreamReader(Objects.requireNonNull(getResource("messages.yml")),java.nio.charset.StandardCharsets.UTF_8)) {bundled.load(reader);}
+        m.setDefaults(bundled);
         settings=candidate; messages=m;
+        quizzes.configure(quizCandidate);
     }
     private static long now() { return System.currentTimeMillis(); }
     @SuppressWarnings("deprecation") private String color(String value) { return ChatColor.translateAlternateColorCodes('&',value); }
@@ -134,10 +143,17 @@ public final class ArcaneWelcome extends JavaPlugin implements Listener, Command
         String text=PlainTextComponentSerializer.plainText().serialize(e.message());
         UUID sender=e.getPlayer().getUniqueId();
         // Preserve ordinary chat, including formatting and normal broadcast.
-        main(() -> WelcomeText.target(text,settings.word).ifPresent(name -> welcome(sender,name)));
+        QuizRound round=quizzes.snapshot();
+        long receivedAt=now();
+        main(() -> {
+            Player player=Bukkit.getPlayer(sender);
+            if(player!=null)quizzes.answer(player,text,round,receivedAt);
+            WelcomeText.target(text,settings.word).ifPresent(name -> welcome(sender,name));
+        });
     }
     private void tick() {
         long time=now();
+        quizzes.tick(time);
         for(var entry:arrivals.entrySet()) {
             var a=entry.getValue(); Player p=Bukkit.getPlayer(entry.getKey());
             if(p!=null && time>=a.starts() && time<a.ends() && announced.add(a.id())) {
@@ -187,6 +203,38 @@ public final class ArcaneWelcome extends JavaPlugin implements Listener, Command
             }
         });
     }
+    void quizSend(CommandSender sender,String key,Map<String,String> values) {
+        String text=messages.getString("prefix","&e&l[Arcane]&r &f")+messages.getString(key,key);
+        for(var entry:values.entrySet())text=text.replace("{"+entry.getKey()+"}",entry.getValue());
+        sender.sendMessage(color(text));
+    }
+    void quizBroadcast(String key,Map<String,String> values) {
+        for(Player p:Bukkit.getOnlinePlayers())quizSend(p,key,values);
+    }
+    void rewardQuiz(Player player,QuizRound round) {
+        String sender=player.getUniqueId().toString();
+        String command=round.command.replace("{player}",player.getName());
+        // One persistent reservation per round. No retry after uncertain command outcomes.
+        worker.submit(() -> {
+            try {
+                if(!store.reserve("quiz-winner",round.id))return;
+                main(() -> {
+                    boolean ok=false;
+                    try {ok=Bukkit.dispatchCommand(Bukkit.getConsoleSender(),command);}
+                    catch(Exception e) {getLogger().severe("Quiz reward command failed: "+e);}
+                    final String status=(ok?"dispatched:":"failed:")+sender;
+                    io(() -> {store.status("quiz-winner",round.id,status);return true;},ignored -> {});
+                    if(!ok) {
+                        getLogger().warning("Quiz reward retained for review: "+round.id+" winner="+sender);
+                        if(player.isOnline())quizSend(player,"quiz-reward-failed",Map.of());
+                    }
+                });
+            } catch(Exception e) {
+                getLogger().severe("Quiz reward reservation failed: "+e);
+                main(() -> {if(player.isOnline())quizSend(player,"quiz-reward-failed",Map.of());});
+            }
+        });
+    }
     private void removeWelcomeTitle(UUID id) {
         if(welcomeTitles.remove(id)) {
             Player p=Bukkit.getPlayer(id);if(p!=null)p.clearTitle();
@@ -201,12 +249,14 @@ public final class ArcaneWelcome extends JavaPlugin implements Listener, Command
                 java.time.Duration.ofMillis(settings.stay*50),
                 java.time.Duration.ofMillis(settings.fadeOut*50));
         p.showTitle(net.kyori.adventure.title.Title.title(
-                serializer.deserialize(settings.titleText),
-                serializer.deserialize(settings.subtitleText),times));
+                serializer.deserialize(settings.titleText.replace("{player}",p.getName())),
+                serializer.deserialize(settings.subtitleText.replace("{player}",p.getName())),times));
         welcomeTitles.add(p.getUniqueId());
     }
     @Override public boolean onCommand(CommandSender sender,Command command,String label,String[] args) {
         if(!sender.hasPermission("arcanew.admin")) {sender.sendMessage(msg("no-permission",""));return true;}
+        if(args.length==2 && args[0].equalsIgnoreCase("quiz") && quizzes.command(sender,args[1]))return true;
+        if(args.length==2 && args[0].equalsIgnoreCase("test") && args[1].equalsIgnoreCase("quiz")) {quizzes.command(sender,"test");return true;}
         if(args.length==1 && args[0].equalsIgnoreCase("reload")) {
             try {loadSettings();sender.sendMessage(msg("reloaded",""));}
             catch(Exception e) {getLogger().warning(e.getMessage());sender.sendMessage(msg("invalid-config",""));}
@@ -225,6 +275,7 @@ public final class ArcaneWelcome extends JavaPlugin implements Listener, Command
     }
     @Override public void onDisable() {
         stopping=true;
+        quizzes.stop(false);
         for(UUID id:new HashSet<>(welcomeTitles))removeWelcomeTitle(id);
         // Close is queued behind all already-submitted database writes.
         worker.submit(() -> {if(store!=null)try{store.close();}catch(Exception e){getLogger().severe(e.toString());}});

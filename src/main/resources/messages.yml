@@ -14,4 +14,11 @@ test-started: '&fTest started. Type welcome {newcomer}. Real rewards: {paid}.'
 test-stopped: '&fYour test session ended.'
 hologram-preview: '&fShowing your private welcome title.'
 no-permission: '&fYou do not have permission.'
-usage: '&f/arcanew reload | /arcanew test join | /arcanew test hologram | /arcanew test stop'
+usage: '&f/arcanew reload | /arcanew test join | /arcanew test hologram | /arcanew test stop | /arcanew test quiz | /arcanew quiz <start|stop|skip>'
+
+quiz-question: '&fQuiz: {question} &7({seconds}s) &fReward: &a&l{amount}'
+quiz-winner: '&f{player} answered correctly. Reward: &a&l{amount}&r&f!'
+quiz-timeout: "&fTime is up! The correct answer was {answer}."
+quiz-stopped: '&fThe quiz was stopped.'
+quiz-running: '&fA quiz is already running. Stop or skip it first.'
+quiz-reward-failed: '&fYour quiz reward could not be dispatched. Contact an administrator.'

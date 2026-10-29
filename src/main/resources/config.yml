@@ -15,7 +15,7 @@ reward:
 # Private screen title. Timing is in ticks: 20 ticks = 1 second.
 title:
   enabled: true
-  text: '&f&lWelcome'
+  text: '&f&lWelcome {player}'
   subtitle: '&bto the server!'
   fade-in-ticks: 10
   stay-ticks: 40

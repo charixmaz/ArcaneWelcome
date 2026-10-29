@@ -20,3 +20,13 @@
 8. Reload config; verify prior real claims still block and new settings apply to future arrivals. Invalid config must retain previous settings.
 9. Stop test/quit/restart; check hologram cleanup. Test a broken reward command and inspect failure logging/claim retention.
 10. Try test/reload commands without admin permission; verify rejection.
+
+## Quiz and personalized title acceptance checks
+- Build and run JUnit (including three simultaneous correct answers yielding one winner, expired/cancelled rounds, exact accepted answers, generated arithmetic, and config validation).
+- `/arcanew test hologram`: your own name appears in the screen welcome.
+- `/arcanew test quiz`: question appears; one correct player gets one reward command. Three players answering together must still produce one reward.
+- For the blue whale question, “whale” must not win. Test accepted Washington spellings.
+- Allow timeout: reveal answer; no money. Start a new round and confirm prior answers are not carried across.
+- Reload malformed quizzes.yml: existing settings remain; reload valid file: current round cancels without reward.
+- Test six-minute/ten-minute intervals, minimum players, disabled categories, optional cooldown and difficulty rewards.
+- Test server restart, broken economy command, and non-admin command rejection.
