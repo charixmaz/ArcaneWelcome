@@ -8,6 +8,7 @@ final class BattleRound {
     record Result(int first,int second) {
         int total() {return first+second;}
         int percent(int count) {return total()==0?0:(int)Math.round(count*100.0/total());}
+        int secondPercent() {return total()==0?0:100-percent(first);}
     }
     final String question,first,second;
     final long deadline;

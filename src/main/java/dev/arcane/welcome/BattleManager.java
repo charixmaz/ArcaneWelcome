@@ -48,7 +48,7 @@ final class BattleManager {
         String key=result.total()==0?"battle-empty":result.first()==result.second()?"battle-tie":"battle-result";
         plugin.quizBroadcast(key,Map.of("question",round.question,"option1",round.first,"option2",round.second,
                 "votes1",String.valueOf(result.first()),"votes2",String.valueOf(result.second()),
-                "percent1",String.valueOf(result.percent(result.first())),"percent2",String.valueOf(result.percent(result.second())),
+                "percent1",String.valueOf(result.percent(result.first())),"percent2",String.valueOf(result.secondPercent()),
                 "total",String.valueOf(result.total()),"winner",result.first()>result.second()?round.first:round.second));
     }
     void stop(boolean announce) {

@@ -33,6 +33,11 @@ class BattleTest {
             assertEquals(1,b.finish(1000,false).total());
         } finally {pool.shutdownNow();}
     }
+    @Test void displayedPercentagesAlwaysSumToOneHundred() {
+        var result=new BattleRound.Result(1,7);
+        assertEquals(100,result.percent(result.first())+result.secondPercent());
+        assertEquals(0,new BattleRound.Result(0,0).secondPercent());
+    }
     @Test void eventGateBlocksOverlapAndGivesAutomaticEventsBreathingRoom() {
         var gate=new ChatEventGate();assertTrue(gate.acquire("quiz",0,false));
         assertFalse(gate.acquire("battle",1,true));gate.release("battle",1);assertTrue(gate.busy());
