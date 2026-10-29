@@ -21,7 +21,8 @@ record QuizSettings(boolean enabled,long interval,long timeout,int minimumPlayer
         if(min>max)throw new IllegalArgumentException("math.minimum-number must not exceed maximum-number");
         String command=validCommand(c.getString("quiz.reward-command","eco give {player} 100"));
         String reward=c.getString("quiz.reward-display","$100");
-        List<String> operations=c.getStringList("math.operations");
+        List<String> operations=c.contains("math.operations")?c.getStringList("math.operations"):
+                List.of("addition","subtraction","multiplication","division");
         if(operations.isEmpty() || !Set.of("addition","subtraction","multiplication","division").containsAll(operations))
             throw new IllegalArgumentException("math.operations must list addition, subtraction, multiplication or division");
         List<Question> questions=new ArrayList<>();
