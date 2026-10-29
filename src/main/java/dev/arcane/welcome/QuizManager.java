@@ -10,11 +10,13 @@ import java.util.concurrent.ThreadLocalRandom;
 final class QuizManager {
     private final ArcaneWelcome plugin;
     private QuizSettings settings;
+    private final ChatEventGate gate;
     private volatile QuizRound active;
     private long nextStart;
     private String previous="";
     private final Map<UUID,Integer> cooldowns=new HashMap<>();
-    QuizManager(ArcaneWelcome plugin) {this.plugin=plugin;}
+    QuizManager(ArcaneWelcome plugin,ChatEventGate gate) {this.plugin=plugin;this.gate=gate;}
+    long nextDue() {return settings!=null && settings.enabled()?nextStart:Long.MAX_VALUE;}
     QuizRound snapshot() {return active;}
     void configure(QuizSettings candidate) {
         if(active!=null)stop(true);
@@ -23,26 +25,32 @@ final class QuizManager {
     void tick(long now) {
         QuizRound round=active;
         if(round!=null && round.expire(now)) {
-            active=null;nextStart=now+settings.interval();
+            active=null;gate.release("quiz",now);nextStart=now+settings.interval();
             plugin.quizBroadcast("quiz-timeout",Map.of("answer",round.answer));
         }
         if(active==null && settings.enabled() && now>=nextStart) {
-            nextStart=now+settings.interval();
-            if(Bukkit.getOnlinePlayers().size()>=settings.minimumPlayers())start();
+            if(Bukkit.getOnlinePlayers().size()>=settings.minimumPlayers())start(false,false);
         }
     }
-    private boolean start() {
+    private boolean start(boolean manual,boolean forceUnscramble) {
         if(active!=null)return false;
         var random=ThreadLocalRandom.current();
+        String type=forceUnscramble?(settings.words().isEmpty()?"none":"unscramble"):settings.pickType(random);
+        if(type.equals("none") || !gate.acquire("quiz",System.currentTimeMillis(),manual))return false;
         QuizSettings.Question selected=null;
-        boolean math=random.nextInt(100)<settings.mathChance();
-        if(!math && !settings.questions().isEmpty()) {
+        if(type.equals("trivia")) {
             var options=settings.questions().stream().filter(q -> !q.id().equals(previous)).toList();
             if(options.isEmpty())options=settings.questions();
             selected=options.get(random.nextInt(options.size()));
         }
         String identity;
-        if(selected==null) {
+        if(type.equals("unscramble")) {
+            var choices=settings.words().stream().filter(w->!("word:"+w).equals(previous)).toList();
+            if(choices.isEmpty())choices=settings.words();
+            String word=choices.get(random.nextInt(choices.size()));
+            identity="word:"+word;
+            selected=new QuizSettings.Question(identity,Unscramble.display(Unscramble.shuffle(word,random)),List.of(word),settings.command(),settings.reward());
+        } else if(selected==null) {
             String question="",answer="";
             // Avoid immediate repeated equations too, where the configured range permits it.
             for(int attempt=0;attempt<20;attempt++) {
@@ -56,7 +64,8 @@ final class QuizManager {
         previous=identity;
         cooldowns.replaceAll((id,left)->left-1);cooldowns.values().removeIf(left->left<=0);
         active=new QuizRound(selected.text(),selected.answers(),System.currentTimeMillis()+settings.timeout(),selected.command(),selected.reward());
-        plugin.quizBroadcast("quiz-question",Map.of("question",active.question,"seconds",String.valueOf(settings.timeout()/1000),"amount",active.reward));
+        active.type=switch(type) {case "math"->"Math";case "unscramble"->"Unscramble";default->"Trivia";};
+        plugin.quizBroadcast(type.equals("unscramble")?"quiz-unscramble":"quiz-question",Map.of("question",active.question,"type",active.type,"seconds",String.valueOf(settings.timeout()/1000),"amount",active.reward));
         return true;
     }
     void answer(Player player,String text,QuizRound submittedRound,long receivedAt) {
@@ -64,21 +73,22 @@ final class QuizManager {
         if(round==null || round!=submittedRound || cooldowns.containsKey(player.getUniqueId()))return;
         // Deadline is checked at processing time as well; an expired round can never pay.
         if(!round.tryWin(text,Math.max(receivedAt,System.currentTimeMillis())))return;
-        active=null;nextStart=System.currentTimeMillis()+settings.interval();
+        active=null;gate.release("quiz",System.currentTimeMillis());nextStart=System.currentTimeMillis()+settings.interval();
         if(settings.cooldown()>0)cooldowns.put(player.getUniqueId(),settings.cooldown()+1);
-        plugin.quizBroadcast("quiz-winner",Map.of("player",player.getName(),"amount",round.reward));
+        plugin.quizBroadcast("quiz-winner",Map.of("player",player.getName(),"amount",round.reward,"answer",round.answer,"elapsed",String.format(Locale.ROOT,"%.1f",(System.currentTimeMillis()-round.startedAt)/1000.0)));
         plugin.rewardQuiz(player,round);
     }
     void stop(boolean announce) {
         QuizRound round=active;active=null;
-        if(round!=null) {round.close();if(announce)plugin.quizBroadcast("quiz-stopped",Map.of());}
+        if(round!=null) {round.close();gate.release("quiz",System.currentTimeMillis());if(announce)plugin.quizBroadcast("quiz-stopped",Map.of());}
         if(settings!=null)nextStart=System.currentTimeMillis()+settings.interval();
     }
     boolean command(CommandSender sender,String action) {
         switch(action.toLowerCase(Locale.ROOT)) {
-            case "start", "test" -> {if(!start())plugin.quizSend(sender,"quiz-running",Map.of());}
+            case "start", "test" -> {if(!start(true,false))plugin.quizSend(sender,"event-busy",Map.of());}
+            case "unscramble" -> {if(!start(true,true))plugin.quizSend(sender,"event-busy",Map.of());}
             case "stop" -> stop(true);
-            case "skip" -> {stop(true);start();}
+            case "skip" -> {stop(true);if(!start(true,false))plugin.quizSend(sender,"event-busy",Map.of());}
             default -> {return false;}
         }
         return true;

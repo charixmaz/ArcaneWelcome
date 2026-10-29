@@ -1,0 +1,24 @@
+# Chat voting battles: social votes, no correct answer and no money rewards.
+# Players type 1, 2, or the full option name in ordinary chat.
+battle:
+  enabled: true
+  # 900 = 15 minutes after startup or the last battle ends.
+  interval-seconds: 900
+  duration-seconds: 45
+  minimum-online-players: 2
+
+# Exactly two options per topic. Add any unique ID.
+# No immediate repeat when more than one topic is available.
+topics:
+  pets:
+    question: 'Which companion wins your heart?'
+    options: ['Cats', 'Dogs']
+  playstyle:
+    question: 'What would you rather do today?'
+    options: ['Building', 'Exploring']
+  home:
+    question: 'Where would you build your next base?'
+    options: ['Mountains', 'Ocean']
+  adventure:
+    question: 'Which trip are you taking?'
+    options: ['Nether', 'End']

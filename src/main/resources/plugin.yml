@@ -2,11 +2,11 @@ name: ArcaneWelcome
 version: '0.1.0'
 main: dev.arcane.welcome.ArcaneWelcome
 api-version: '26.1'
-description: Reward friendly first-join welcomes in normal chat.
+description: Friendly welcomes, first-winner quizzes, and social chat voting battles.
 commands:
   arcanew:
     description: ArcaneWelcome administration
-    usage: /arcanew <reload|test join|test hologram|test quiz|test stop|quiz start|quiz stop|quiz skip>
+    usage: /arcanew <reload|test|quiz|battle>
     permission: arcanew.admin
 permissions:
   arcanew.admin:

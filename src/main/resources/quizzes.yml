@@ -63,3 +63,19 @@ questions:
     category: minecraft
     answers:
       - 'Obsidian'
+
+unscramble:
+  enabled: true
+  # Percent of NON-MATH rounds using unscramble instead of trivia.
+  # With math 40 and this 50: roughly 40% math, 30% words, 30% trivia.
+  chance-percent: 50
+  # One word per entry, 3–24 English letters. No spaces or punctuation.
+  words:
+    - diamond
+    - creeper
+    - obsidian
+    - village
+    - redstone
+    - emerald
+    - lantern
+    - fortress

@@ -1,5 +1,6 @@
-# Legacy color codes: &e yellow, &f white, &a green, &b cyan, &l bold, &r reset.
-# {amount} is reward.display-amount; it is a label, not payment verification.
+# &e yellow, &f white, &a green, &b cyan, &l bold, &r reset.
+# Event cards use a list of lines. Only the first line receives the Arcane prefix.
+# You can also use one quoted string instead of a list for any event message.
 prefix: '&e&l[Arcane]&r &f'
 announcement: '&f{newcomer} is new! Type welcome {newcomer} to welcome them.'
 reward: '&fReward command sent for &a&l{amount}&r&f. Thanks for welcoming {newcomer}!'
@@ -8,17 +9,55 @@ self: '&fYou cannot welcome yourself.'
 closed: '&fThat player is not currently accepting welcomes.'
 failed: '&fReward could not be dispatched. Contact an administrator.'
 busy: '&fYour previous welcome is still being processed.'
-reloaded: '&fArcaneWelcome configuration reloaded.'
+reloaded: '&fSettings reloaded. Chat events will follow the new schedule.'
 invalid-config: '&fInvalid configuration; previous settings remain active. Check the console.'
 test-started: '&fTest started. Type welcome {newcomer}. Real rewards: {paid}.'
-test-stopped: '&fYour test session ended.'
+test-stopped: '&fYour welcome test ended.'
 hologram-preview: '&fShowing your private welcome title.'
 no-permission: '&fYou do not have permission.'
-usage: '&f/arcanew reload | /arcanew test join | /arcanew test hologram | /arcanew test stop | /arcanew test quiz | /arcanew quiz <start|stop|skip>'
+usage:
+  - '&b&lADMIN &8• &fWelcomes, quizzes & chat battles'
+  - '&e/arcanew reload &7— reload settings'
+  - '&e/arcanew test <join|hologram|quiz|unscramble|battle>'
+  - '&e/arcanew quiz <start|stop|skip|unscramble>'
+  - '&e/arcanew battle <start|stop|skip|end>'
+  - '&e/arcanew test stop &7— end your welcome preview'
 
-quiz-question: '&fQuiz: {question} &7({seconds}s) &fReward: &a&l{amount}'
-quiz-winner: '&f{player} answered correctly. Reward: &a&l{amount}&r&f!'
-quiz-timeout: "&fTime is up! The correct answer was {answer}."
-quiz-stopped: '&fThe quiz was stopped.'
+quiz-question:
+  - '&b&lQUIZ &8• &7{type}'
+  - '&f{question}'
+  - '&7Answer in chat &8• &7First correct wins &8• &a&l{amount}&r &8• &f{seconds}s'
+quiz-unscramble:
+  - '&b&lQUIZ &8• &7Unscramble'
+  - '&fPut these letters in order: &e&l{question}'
+  - '&7Type the word in chat &8• &a&l{amount}&r &8• &f{seconds}s'
+quiz-winner:
+  - '&f{player} answered correctly. Reward: &a&l{amount}&r&f!'
+  - '&7Answer: &f{answer} &8• &7Solved in &f{elapsed}s'
+quiz-timeout:
+  - '&b&lQUIZ &8• &7Time is up'
+  - '&7Correct answer: &f{answer} &8• &7No winner this round.'
+quiz-stopped: '&7Quiz cancelled. No reward was issued.'
 quiz-running: '&fA quiz is already running. Stop or skip it first.'
+event-busy: '&fCannot start this event. Another chat event is running, or this event has no enabled content.'
 quiz-reward-failed: '&fYour quiz reward could not be dispatched. Contact an administrator.'
+
+battle-question:
+  - '&b&lCHAT BATTLE &8• &7Pick your side'
+  - '&f{question}'
+  - '&e&l1&r &f{option1} &8| &e&l2&r &f{option2}'
+  - '&7Type &f1 &7or &f2 &7in chat &8• &7One vote each &8• &f{seconds}s'
+battle-voted: '&7Vote counted. Results appear when the battle ends.'
+battle-already: '&7You have already voted in this battle.'
+battle-result:
+  - '&b&lCHAT BATTLE &8• &f{winner} &7wins!'
+  - '&f{option1}: &e{votes1} &7({percent1}%) &8| &f{option2}: &e{votes2} &7({percent2}%)'
+  - '&7{total} players voted. Thanks for joining in!'
+battle-tie:
+  - '&b&lCHAT BATTLE &8• &7It is a tie!'
+  - '&f{option1}: &e{votes1} &7({percent1}%) &8| &f{option2}: &e{votes2} &7({percent2}%)'
+  - '&7{total} players voted. Both sides stand strong.'
+battle-empty:
+  - '&b&lCHAT BATTLE &8• &7No votes this time'
+  - '&7Battle ended. Join the next one by typing &f1 &7or &f2&7.'
+battle-stopped: '&7Chat battle cancelled. Votes were discarded.'

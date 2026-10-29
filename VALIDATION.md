@@ -30,3 +30,11 @@
 - Reload malformed quizzes.yml: existing settings remain; reload valid file: current round cancels without reward.
 - Test six-minute/ten-minute intervals, minimum players, disabled categories, optional cooldown and difficulty rewards.
 - Test server restart, broken economy command, and non-admin command rejection.
+
+## Chat battles / unscramble acceptance checks
+- JUnit: one immutable ballot per UUID, simultaneous duplicate ballots, late/invalid votes, cancellation, counts/percentages, no-vote results, shared gate, unscramble letter conservation and non-identity shuffle, config rejection, and chat-card formatting.
+- With two clients, `/arcanew test battle`: vote with 1/2 and names; reconnect and try to vote twice. Exactly one ballot per UUID must count. Verify win, tie, no-vote, stop, skip and early end displays.
+- Start a quiz during a battle (and vice versa): must refuse without interrupting the active event. Automatic events must leave a 15-second gap.
+- `/arcanew test unscramble`: inspect readability, solve the word, verify exactly one real reward and a complete winner card.
+- Validate private confirmations, event-card wrapping at normal chat width, and tab completion in a live Paper client. No in-game visual verification is claimed by automated tests.
+- Reload a broken battles.yml or quizzes.yml during an active event: prior runtime settings and event must remain. Valid reload cancels the event and resets schedules. Restart must not replay votes or rewards.

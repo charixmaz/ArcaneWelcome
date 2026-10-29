@@ -6,6 +6,8 @@ import java.util.*;
 final class QuizRound {
     final String id = "quiz:" + UUID.randomUUID();
     final String question, answer, command, reward;
+    String type="Trivia";
+    final long startedAt=System.currentTimeMillis();
     final long deadline;
     private final Set<String> answers;
     private boolean closed;

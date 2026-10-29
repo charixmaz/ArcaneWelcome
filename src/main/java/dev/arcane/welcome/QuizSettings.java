@@ -7,7 +7,7 @@ import java.util.*;
 
 record QuizSettings(boolean enabled,long interval,long timeout,int minimumPlayers,int cooldown,
                     int mathChance,int min,int max,List<String> operations,List<Question> questions,
-                    String command,String reward) {
+                    String command,String reward,boolean mathEnabled,int unscrambleChance,List<String> words) {
     record Question(String id,String text,List<String> answers,String command,String reward) {}
     static QuizSettings load(File file) throws Exception {
         var c=new YamlConfiguration();c.load(file);
@@ -40,19 +40,34 @@ record QuizSettings(boolean enabled,long interval,long timeout,int minimumPlayer
             String label=c.getString("difficulty-rewards."+difficulty+".display",reward);
             questions.add(new Question(id,text,List.copyOf(answers),cmd,label));
         }
+        boolean scramble=c.getBoolean("unscramble.enabled",true);
+        int scrambleChance=(int)number(c,"unscramble.chance-percent",50,0,100);
+        List<String> words=c.contains("unscramble.words")?c.getStringList("unscramble.words"):
+                List.of("diamond","creeper","obsidian","village","redstone","emerald");
+        if(words.stream().anyMatch(w->!Unscramble.valid(w)))throw new IllegalArgumentException("unscramble.words must contain 3–24 letter words with different letters");
+        words=words.stream().map(w->w.toLowerCase(Locale.ROOT)).distinct().toList();
+        if(scramble && words.isEmpty())throw new IllegalArgumentException("Add unscramble.words or disable unscramble");
+        if(!scramble)words=List.of();
         boolean math=c.getBoolean("math.enabled",true);
         if(!math)chance=0;
-        if(questions.isEmpty() && !math && c.getBoolean("quiz.enabled",true))
-            throw new IllegalArgumentException("Enable math or supply at least one enabled trivia question");
+        if(questions.isEmpty() && !math && words.isEmpty() && c.getBoolean("quiz.enabled",true))
+            throw new IllegalArgumentException("Enable math, unscramble, or at least one trivia question");
         return new QuizSettings(c.getBoolean("quiz.enabled",true),interval*1000,timeout*1000,minimum,cooldown,
-                questions.isEmpty() && math?100:chance,min,max,List.copyOf(operations),List.copyOf(questions),command,reward);
+                chance,min,max,List.copyOf(operations),List.copyOf(questions),command,reward,math,scrambleChance,List.copyOf(words));
+    }
+    String pickType(java.util.random.RandomGenerator random) {
+        if(mathEnabled && random.nextInt(100)<mathChance)return "math";
+        if(!words.isEmpty() && random.nextInt(100)<unscrambleChance)return "unscramble";
+        if(!questions.isEmpty())return "trivia";
+        if(!words.isEmpty())return "unscramble";
+        return mathEnabled?"math":"none";
     }
     static String validCommand(String command) {
         if(command==null || command.isBlank() || command.startsWith("/") || command.contains("\n") || command.contains("\r"))
             throw new IllegalArgumentException("Quiz reward commands must be console commands without a leading slash");
         return command;
     }
-    private static long number(YamlConfiguration c,String path,long fallback,long min,long max) {
+    static long number(YamlConfiguration c,String path,long fallback,long min,long max) {
         if(c.contains(path) && (!c.isInt(path) && !c.isLong(path)))throw new IllegalArgumentException(path+" must be an integer");
         long value=c.getLong(path,fallback);
         if(value<min || value>max)throw new IllegalArgumentException(path+" must be "+min+".."+max);

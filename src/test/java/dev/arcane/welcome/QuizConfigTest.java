@@ -43,6 +43,12 @@ class QuizConfigTest {
             """);
         assertEquals(1,c.questions().size());assertEquals("$200",c.questions().getFirst().reward());
     }
+    @Test void unscrambleOnlyPoolAndInvalidWords() throws Exception {
+        var c=load("math:\n  enabled: false\nunscramble:\n  enabled: true\n  words: [diamond, creeper]\n");
+        assertEquals("unscramble",c.pickType(new Random(42)));
+        assertThrows(IllegalArgumentException.class,()->load("unscramble:\n  words: [aaaa]\n"));
+        assertThrows(IllegalArgumentException.class,()->load("math:\n  enabled: false\nunscramble:\n  enabled: false\n"));
+    }
     @Test void generatedEquationsHaveCorrectWholeNumberAnswers() {
         var random=new Random(42);
         for(String operation:List.of("addition","subtraction","multiplication","division")) {

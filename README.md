@@ -45,7 +45,7 @@ On startup, unchanged original message/hologram defaults are upgraded to the new
 
 Existing installations receive missing `title` settings automatically on startup. Old `hologram` settings are unused; the old enabled setting is carried over on first migration. Customize the new `title` section for text and timing.
 
-## Automatic chat quizzes
+## Automatic chat quizzes and word games
 `quizzes.yml` contains all quiz settings and questions. The default is a quiz 10 minutes after startup and 10 minutes after each round ends, with 30 seconds to answer. Set `quiz.interval-seconds: 360` for six minutes. Only the first correct answer accepted by the server wins; other correct answers receive no reward. A round closes before its reward reservation/payment begins, including when several players answer at nearly the same time.
 
 Players answer in normal chat. Answers ignore capitalization and repeated spaces but otherwise must match one item in `answers`. “Whale” does not match “Blue whale”. Timeout reveals the first listed answer. Trivia and generated math mix randomly; division uses whole-number answers. Immediate repeats are avoided where the available question pool/range permits it.
@@ -72,3 +72,29 @@ Admin commands (permission `arcanew.admin`):
 Quiz announcements use configurable `quiz-*` entries in `messages.yml`, with the bold yellow Arcane prefix, white text, and bold green money. New message keys are added on startup without overwriting customized text.
 
 The screen welcome now supports `{player}` in both `title.text` and `title.subtitle`. The default is `&f&lWelcome {player}` with `&bto the server!` beneath it. Existing unchanged defaults migrate automatically; customized titles remain intact.
+
+## Feature 2: Unscramble rounds and polished chat cards
+Quizzes now mix trivia, generated arithmetic, and unscramble words. Configure `unscramble` in `quizzes.yml`: `enabled`, `chance-percent`, and a simple `words` list. The unscramble percentage applies to non-math rounds: the defaults produce approximately 40% math, 30% words, 30% trivia. If a source is unavailable, the remaining enabled sources are used. To run only words, disable math and remove/disable trivia categories. Only the first correct full word wins, using the quiz reward and cooldown protections already in place.
+
+Words must use 3–24 English letters, with at least two different letters. The displayed shuffle never equals the solution; repeated letters are retained correctly. Immediate repeats are avoided when another word exists.
+
+Preview a word round with `/arcanew test unscramble` or `/arcanew quiz unscramble`. This pays the REAL quiz reward to the first winner.
+
+Event messages in `messages.yml` support either one string or a list of lines. The first line receives the bold yellow Arcane prefix; detail lines are indented. Defaults use cyan headings, white questions, yellow choices/letters, muted instructions, and bold green money. Quiz winner cards include the answer and elapsed seconds. Original shipped quiz messages are upgraded automatically; owner-customized messages are preserved.
+
+## Feature 3: Chat voting battles
+`battles.yml` controls automatic two-choice chat battles. Defaults: every 15 minutes, 45 seconds to vote, at least two online players. Players type `1`, `2`, or the full option name in normal chat. Capitalization and extra spaces are ignored. Only exact option names count, so ordinary conversation is unaffected. Each UUID gets one vote; votes cannot be changed, and reconnecting cannot grant another vote. A private confirmation is sent when counted. The public result shows counts and percentages, including proper tie/no-vote results. Battles have no money rewards.
+
+Minimal topic:
+```yaml
+topics:
+  pets:
+    question: 'Cats or dogs?'
+    options: ['Cats', 'Dogs']
+```
+
+`/arcanew test battle` or `/arcanew battle start` starts a battle immediately. `/arcanew battle end` closes voting and shows results early. `/arcanew battle stop` discards votes; `/arcanew battle skip` moves to another topic. Admin commands tab-complete and all require `arcanew.admin`. Manual tests bypass minimum player count and automatic enable switches but never interrupt another live event.
+
+Quizzes and battles share an event gate: one at a time, with a 15-second gap between automatic events. The oldest due event goes first when both are waiting. Welcome messages still work throughout. Admin tests can bypass the gap but cannot overlap an active event. Reload or restart cancels active rounds; votes are temporary and never replayed. A valid reload resets both schedules, while invalid files retain current runtime settings. Configure all `battle-*` and `quiz-*` chat cards in `messages.yml`.
+
+On upgrade, `battles.yml` is created and the default unscramble section is added to existing `quizzes.yml` without replacing trivia questions. If you previously customized quiz message strings, edit them yourself to adopt the new multiline layout.

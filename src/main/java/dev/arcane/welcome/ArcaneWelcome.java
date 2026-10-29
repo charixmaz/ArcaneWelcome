@@ -16,7 +16,7 @@ import java.util.*;
 import java.util.concurrent.*;
 import java.util.function.Consumer;
 
-public final class ArcaneWelcome extends JavaPlugin implements Listener, CommandExecutor {
+public final class ArcaneWelcome extends JavaPlugin implements Listener, CommandExecutor, TabCompleter {
     private final ExecutorService worker = Executors.newSingleThreadExecutor();
     private final Map<UUID, Store.Arrival> arrivals = new HashMap<>();
     private final Map<UUID, Trial> trials = new HashMap<>();
@@ -26,7 +26,9 @@ public final class ArcaneWelcome extends JavaPlugin implements Listener, Command
     private volatile boolean stopping;
     private Store store;
     private Settings settings;
-    private final QuizManager quizzes = new QuizManager(this);
+    private final ChatEventGate chatEvents = new ChatEventGate();
+    private final QuizManager quizzes = new QuizManager(this,chatEvents);
+    private final BattleManager battles = new BattleManager(this,chatEvents);
     private YamlConfiguration messages;
     private record Trial(String id, String name, long starts, long ends) {}
     private record Settings(long delay, long duration, String word, String command,
@@ -37,6 +39,7 @@ public final class ArcaneWelcome extends JavaPlugin implements Listener, Command
         saveDefaultConfig();
         if (!new File(getDataFolder(), "messages.yml").exists()) saveResource("messages.yml", false);
         if (!new File(getDataFolder(), "quizzes.yml").exists()) saveResource("quizzes.yml", false);
+        if (!new File(getDataFolder(), "battles.yml").exists()) saveResource("battles.yml", false);
         try { upgradeDefaultStyle(); loadSettings(); }
         catch (Exception e) { getLogger().severe("Invalid configuration: " + e.getMessage()); getServer().getPluginManager().disablePlugin(this); return; }
         // Initial open happens once before accepting events; all subsequent I/O uses the worker.
@@ -44,6 +47,7 @@ public final class ArcaneWelcome extends JavaPlugin implements Listener, Command
         catch (Exception e) { getLogger().severe("Database unavailable: " + e); getServer().getPluginManager().disablePlugin(this); return; }
         getServer().getPluginManager().registerEvents(this,this);
         Objects.requireNonNull(getCommand("arcanew")).setExecutor(this);
+        getCommand("arcanew").setTabCompleter(this);
         for (Player p : Bukkit.getOnlinePlayers()) register(p, false);
         Bukkit.getScheduler().runTaskTimer(this,this::tick,20,20);
     }
@@ -55,7 +59,10 @@ public final class ArcaneWelcome extends JavaPlugin implements Listener, Command
         var bundled=new YamlConfiguration();
         try(var reader=new java.io.InputStreamReader(Objects.requireNonNull(getResource("messages.yml")),java.nio.charset.StandardCharsets.UTF_8)) {bundled.load(reader);}
         Map<String,String> legacy=Map.ofEntries(
-            Map.entry("usage", "&f/arcanew reload | /arcanew test join | /arcanew test hologram | /arcanew test stop"),
+            Map.entry("usage", "&f/arcanew reload | /arcanew test join | /arcanew test hologram | /arcanew test stop | /arcanew test quiz | /arcanew quiz <start|stop|skip>"),
+            Map.entry("quiz-question", "&fQuiz: {question} &7({seconds}s) &fReward: &a&l{amount}"),
+            Map.entry("quiz-winner", "&f{player} answered correctly. Reward: &a&l{amount}&r&f!"),
+            Map.entry("quiz-timeout", "&fTime is up! The correct answer was {answer}."),
             Map.entry("hologram-preview","&fShowing your private welcome hologram."),
             Map.entry("announcement","&d{newcomer} is new! &fType welcome {newcomer} to welcome them."),
             Map.entry("reward","&aWelcome reward command sent. Thanks for welcoming {newcomer}!"),
@@ -72,10 +79,19 @@ public final class ArcaneWelcome extends JavaPlugin implements Listener, Command
         boolean changed=false;
         for(String key:bundled.getKeys(false)) {
             if(!current.contains(key) || Objects.equals(current.getString(key),legacy.get(key))) {
-                current.set(key,bundled.getString(key));changed=true;
+                current.set(key,bundled.get(key));changed=true;
             }
         }
         if(changed)current.save(file);
+        // Add the new owner-editable word list without replacing existing questions/settings.
+        File quizFile=new File(getDataFolder(),"quizzes.yml");
+        var quizConfig=new YamlConfiguration();quizConfig.load(quizFile);
+        if(!quizConfig.contains("unscramble")) {
+            var quizDefaults=new YamlConfiguration();
+            try(var reader=new java.io.InputStreamReader(Objects.requireNonNull(getResource("quizzes.yml")),java.nio.charset.StandardCharsets.UTF_8)) {quizDefaults.load(reader);}
+            quizConfig.set("unscramble",Objects.requireNonNull(quizDefaults.getConfigurationSection("unscramble")).getValues(false));
+            quizConfig.save(quizFile);
+        }
         File configFile=new File(getDataFolder(),"config.yml");
         var config=YamlConfiguration.loadConfiguration(configFile);
         boolean configChanged=false;
@@ -110,11 +126,13 @@ public final class ArcaneWelcome extends JavaPlugin implements Listener, Command
                 test,seconds(c,"test.delay-seconds",0,86400),c.getBoolean("test.pay-rewards",true),c.getString("reward.display-amount","$50"));
         // Parse all files before committing any runtime changes; bad reload keeps prior settings.
         QuizSettings quizCandidate=QuizSettings.load(new File(getDataFolder(),"quizzes.yml"));
+        BattleSettings battleCandidate=BattleSettings.load(new File(getDataFolder(),"battles.yml"));
         var bundled=new YamlConfiguration();
         try(var reader=new java.io.InputStreamReader(Objects.requireNonNull(getResource("messages.yml")),java.nio.charset.StandardCharsets.UTF_8)) {bundled.load(reader);}
         m.setDefaults(bundled);
         settings=candidate; messages=m;
         quizzes.configure(quizCandidate);
+        battles.configure(battleCandidate);
     }
     private static long now() { return System.currentTimeMillis(); }
     @SuppressWarnings("deprecation") private String color(String value) { return ChatColor.translateAlternateColorCodes('&',value); }
@@ -144,16 +162,19 @@ public final class ArcaneWelcome extends JavaPlugin implements Listener, Command
         UUID sender=e.getPlayer().getUniqueId();
         // Preserve ordinary chat, including formatting and normal broadcast.
         QuizRound round=quizzes.snapshot();
+        BattleRound battle=battles.snapshot();
         long receivedAt=now();
         main(() -> {
             Player player=Bukkit.getPlayer(sender);
-            if(player!=null)quizzes.answer(player,text,round,receivedAt);
+            if(player!=null) {quizzes.answer(player,text,round,receivedAt);battles.vote(player,text,battle,receivedAt);}
             WelcomeText.target(text,settings.word).ifPresent(name -> welcome(sender,name));
         });
     }
     private void tick() {
         long time=now();
-        quizzes.tick(time);
+        // Give the oldest due event priority; the shared gate prevents overlap.
+        if(battles.nextDue()<quizzes.nextDue()) {battles.tick(time);quizzes.tick(time);}
+        else {quizzes.tick(time);battles.tick(time);}
         for(var entry:arrivals.entrySet()) {
             var a=entry.getValue(); Player p=Bukkit.getPlayer(entry.getKey());
             if(p!=null && time>=a.starts() && time<a.ends() && announced.add(a.id())) {
@@ -204,9 +225,8 @@ public final class ArcaneWelcome extends JavaPlugin implements Listener, Command
         });
     }
     void quizSend(CommandSender sender,String key,Map<String,String> values) {
-        String text=messages.getString("prefix","&e&l[Arcane]&r &f")+messages.getString(key,key);
-        for(var entry:values.entrySet())text=text.replace("{"+entry.getKey()+"}",entry.getValue());
-        sender.sendMessage(color(text));
+        List<String> lines=messages.isList(key)?messages.getStringList(key):List.of(messages.getString(key,key));
+        for(String line:ChatMessages.render(messages.getString("prefix","&e&l[Arcane]&r &f"),lines,values))sender.sendMessage(color(line));
     }
     void quizBroadcast(String key,Map<String,String> values) {
         for(Player p:Bukkit.getOnlinePlayers())quizSend(p,key,values);
@@ -255,6 +275,9 @@ public final class ArcaneWelcome extends JavaPlugin implements Listener, Command
     }
     @Override public boolean onCommand(CommandSender sender,Command command,String label,String[] args) {
         if(!sender.hasPermission("arcanew.admin")) {sender.sendMessage(msg("no-permission",""));return true;}
+        if(args.length==2 && args[0].equalsIgnoreCase("battle") && battles.command(sender,args[1]))return true;
+        if(args.length==2 && args[0].equalsIgnoreCase("test") && args[1].equalsIgnoreCase("battle")) {battles.command(sender,"test");return true;}
+        if(args.length==2 && args[0].equalsIgnoreCase("test") && args[1].equalsIgnoreCase("unscramble")) {quizzes.command(sender,"unscramble");return true;}
         if(args.length==2 && args[0].equalsIgnoreCase("quiz") && quizzes.command(sender,args[1]))return true;
         if(args.length==2 && args[0].equalsIgnoreCase("test") && args[1].equalsIgnoreCase("quiz")) {quizzes.command(sender,"test");return true;}
         if(args.length==1 && args[0].equalsIgnoreCase("reload")) {
@@ -271,11 +294,25 @@ public final class ArcaneWelcome extends JavaPlugin implements Listener, Command
                 send(p,"test-started",settings.testName);tick();return true;
             }
         }
-        sender.sendMessage(msg("usage",""));return true;
+        quizSend(sender,"usage",Map.of());return true;
+    }
+    @Override public List<String> onTabComplete(CommandSender sender,Command command,String alias,String[] args) {
+        if(!sender.hasPermission("arcanew.admin"))return List.of();
+        List<String> choices=List.of();
+        if(args.length==1)choices=List.of("reload","quiz","battle","test");
+        else if(args.length==2)choices=switch(args[0].toLowerCase(Locale.ROOT)) {
+            case "quiz"->List.of("start","stop","skip","unscramble");
+            case "battle"->List.of("start","stop","skip","end");
+            case "test"->List.of("join","hologram","quiz","unscramble","battle","stop");
+            default->List.of();
+        };
+        String input=args[args.length-1].toLowerCase(Locale.ROOT);
+        return choices.stream().filter(c->c.startsWith(input)).toList();
     }
     @Override public void onDisable() {
         stopping=true;
         quizzes.stop(false);
+        battles.stop(false);
         for(UUID id:new HashSet<>(welcomeTitles))removeWelcomeTitle(id);
         // Close is queued behind all already-submitted database writes.
         worker.submit(() -> {if(store!=null)try{store.close();}catch(Exception e){getLogger().severe(e.toString());}});
