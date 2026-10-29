@@ -38,3 +38,8 @@
 - `/arcanew test unscramble`: inspect readability, solve the word, verify exactly one real reward and a complete winner card.
 - Validate private confirmations, event-card wrapping at normal chat width, and tab completion in a live Paper client. No in-game visual verification is claimed by automated tests.
 - Reload a broken battles.yml or quizzes.yml during an active event: prior runtime settings and event must remain. Valid reload cancels the event and resets schedules. Restart must not replay votes or rewards.
+
+## Expanded pack checks
+- Require 240 trivia entries (80 in each bundled category), 240 unique battle question/option combinations, and 240 unique valid words.
+- Every shipped trivia answer is one English word, and question text is unique.
+- Test one-time additive migration, owner edits/settings preservation, word deduplication, unchanged legacy multiword demo removal, and no re-adding deleted content after migration.

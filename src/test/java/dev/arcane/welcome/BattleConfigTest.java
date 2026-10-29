@@ -13,7 +13,7 @@ class BattleConfigTest {
     }
     @Test void bundledTopicsAndUiLoad() throws Exception {
         var b=BattleSettings.load(Path.of("src/main/resources/battles.yml").toFile());
-        assertEquals(4,b.topics().size());assertEquals(45000,b.duration());assertEquals(2,b.minimum());
+        assertEquals(240,b.topics().size());assertEquals(45000,b.duration());assertEquals(2,b.minimum());
         var m=new org.bukkit.configuration.file.YamlConfiguration();m.load(Path.of("src/main/resources/messages.yml").toFile());
         for(String key:List.of("quiz-question","quiz-unscramble","quiz-winner","battle-question","battle-result","battle-tie","battle-empty"))
             assertTrue(m.getStringList(key).size()>=2,key);

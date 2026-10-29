@@ -98,3 +98,10 @@ topics:
 Quizzes and battles share an event gate: one at a time, with a 15-second gap between automatic events. The oldest due event goes first when both are waiting. Welcome messages still work throughout. Admin tests can bypass the gap but cannot overlap an active event. Reload or restart cancels active rounds; votes are temporary and never replayed. A valid reload resets both schedules, while invalid files retain current runtime settings. Configure all `battle-*` and `quiz-*` chat cards in `messages.yml`.
 
 On upgrade, `battles.yml` is created and the default unscramble section is added to existing `quizzes.yml` without replacing trivia questions. If you previously customized quiz message strings, edit them yourself to adopt the new multiline layout.
+
+## Expanded ready-to-play content pack
+The bundled files include **240 one-word trivia questions** (80 general knowledge, 80 geography, 80 Minecraft), **240 different two-option battles**, and **240 unique unscramble words**. Generated math rounds remain unlimited. Trivia uses short questions with a single-word answer; no multiword city names or whale-species names are needed in the bundled pack. Owners may still add multiword answers if desired.
+
+Example: `What is the capital of Slovakia?` → `Bratislava`. The Slovak animal clue accepts `Bear`. All word puzzles use 3–24 letters with at least two distinct letters. Battle choices are opinions, with no correct answer and no money reward.
+
+Existing installations receive the pack once at startup. New question/topic IDs are added without replacing owner-customized IDs; words are merged case-insensitively. Original unchanged multiword demo questions are removed. Custom questions, categories, intervals, rewards, and battle topics remain intact. Before a file is merged, its previous contents are saved as `quizzes.yml.pre-pack-1.bak` or `battles.yml.pre-pack-1.bak`. `content-pack-version: 1` records completion, so later owner deletions are not undone on restart. After the upgrade, edit files normally and use `/arcanew reload`.

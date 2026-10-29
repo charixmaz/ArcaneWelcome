@@ -11,11 +11,13 @@ class QuizConfigTest {
     private QuizSettings load(String content) throws Exception {
         Path file=dir.resolve("quizzes.yml");Files.writeString(file,content);return QuizSettings.load(file.toFile());
     }
-    @Test void defaultConfigAndExplicitWhaleAnswer() throws Exception {
+    @Test void defaultConfigHasSimpleSingleWordAnswers() throws Exception {
         var c=QuizSettings.load(Path.of("src/main/resources/quizzes.yml").toFile());
         assertEquals(600000,c.interval());assertEquals(30000,c.timeout());assertEquals(0,c.cooldown());
-        var whale=c.questions().stream().filter(q->q.id().equals("biggest-animal")).findFirst().orElseThrow();
-        assertEquals(List.of("Blue whale"),whale.answers());assertEquals("$100",whale.reward());
+        assertEquals(240,c.questions().size());assertEquals(240,c.words().size());
+        for(var q:c.questions())for(String answer:q.answers())assertTrue(answer.matches("[A-Za-z]+"),answer);
+        var bear=c.questions().stream().filter(q->q.text().contains("Slovakia") && q.answers().equals(List.of("Bear"))).findFirst().orElseThrow();
+        assertEquals("$100",bear.reward());
     }
     @Test void rejectsInvalidTimersAnswersAndUnsafeCommands() {
         assertThrows(IllegalArgumentException.class,()->load("quiz:\n  interval-seconds: 0\n"));

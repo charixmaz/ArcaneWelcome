@@ -40,7 +40,7 @@ public final class ArcaneWelcome extends JavaPlugin implements Listener, Command
         if (!new File(getDataFolder(), "messages.yml").exists()) saveResource("messages.yml", false);
         if (!new File(getDataFolder(), "quizzes.yml").exists()) saveResource("quizzes.yml", false);
         if (!new File(getDataFolder(), "battles.yml").exists()) saveResource("battles.yml", false);
-        try { upgradeDefaultStyle(); loadSettings(); }
+        try { upgradeDefaultStyle(); upgradeContentPack("quizzes.yml","questions",true); upgradeContentPack("battles.yml","topics",false); loadSettings(); }
         catch (Exception e) { getLogger().severe("Invalid configuration: " + e.getMessage()); getServer().getPluginManager().disablePlugin(this); return; }
         // Initial open happens once before accepting events; all subsequent I/O uses the worker.
         try { store = new Store(getDataFolder().toPath().resolve("welcome.db")); }
@@ -109,6 +109,18 @@ public final class ArcaneWelcome extends JavaPlugin implements Listener, Command
         }
         if("&f&lWelcome".equals(config.getString("title.text"))) {config.set("title.text","&f&lWelcome {player}");configChanged=true;}
         if(configChanged)config.save(configFile);
+    }
+    private void upgradeContentPack(String resource,String section,boolean words) throws Exception {
+        File file=new File(getDataFolder(),resource);
+        var current=new YamlConfiguration();current.load(file);
+        var bundled=new YamlConfiguration();
+        try(var reader=new java.io.InputStreamReader(Objects.requireNonNull(getResource(resource)),java.nio.charset.StandardCharsets.UTF_8)) {bundled.load(reader);}
+        if(ContentPack.merge(current,bundled,section,words)) {
+            var backup=file.toPath().resolveSibling(resource+".pre-pack-"+bundled.getInt("content-pack-version")+".bak");
+            if(!java.nio.file.Files.exists(backup))java.nio.file.Files.copy(file.toPath(),backup);
+            current.save(file);
+            getLogger().info("Installed expanded content pack in "+resource+"; previous file backed up as "+backup.getFileName());
+        }
     }
     private long seconds(YamlConfiguration c,String path,long min,long max) {
         long v=c.getLong(path); if(v<min || v>max) throw new IllegalArgumentException(path+" must be "+min+".."+max); return v;

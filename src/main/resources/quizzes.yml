@@ -1,81 +1,1481 @@
-# Reload all settings/questions with /arcanew reload.
-# Only the FIRST correct answer wins. Answers are normal chat, not commands.
+# Easy trivia: every bundled answer is ONE word. Edit answers freely.
+# Categories: 80 general, 80 geography, 80 Minecraft.
 quiz:
   enabled: true
-  # 360 = 6 minutes, 600 = 10 minutes. Wait this long after a round ends.
   interval-seconds: 600
   answer-time-seconds: 30
   minimum-online-players: 1
-  # 0 disables this; 1 makes the last winner sit out the following round.
   winner-cooldown-rounds: 0
-  # Console command without /. This must be provided by your economy plugin.
-  reward-command: 'eco give {player} 100'
-  # Display label only; keep it in sync with the command above.
-  reward-display: '$100'
-
+  reward-command: eco give {player} 100
+  reward-display: $100
 math:
   enabled: true
-  # Percent of rounds using generated math instead of trivia.
   chance-percent: 40
   minimum-number: 1
   maximum-number: 50
-  # Division generates a nonzero divisor and a whole-number answer.
-  # Division's displayed dividend may be larger than maximum-number.
-  operations: [addition, subtraction, multiplication, division]
-
-# Optional categories: set false to exclude a category's questions.
+  operations:
+  - addition
+  - subtraction
+  - multiplication
+  - division
 categories:
   general: true
   geography: true
   minecraft: true
-
-# Optional: only applies to questions specifying the matching difficulty.
-# Questions without a difficulty use the default reward above.
 difficulty-rewards:
   easy:
-    command: 'eco give {player} 50'
-    display: '$50'
+    command: eco give {player} 50
+    display: $50
   medium:
-    command: 'eco give {player} 100'
-    display: '$100'
+    command: eco give {player} 100
+    display: $100
   hard:
-    command: 'eco give {player} 200'
-    display: '$200'
-
-# Add any unique ID. A question and an answers list are all you need.
-# Only listed answers count (case and extra spaces are ignored).
-# The first answer is revealed when time runs out.
+    command: eco give {player} 200
+    display: $200
 questions:
-  usa-capital:
-    question: 'What is the capital of the USA?'
+  pack-geography-001:
+    question: What is the capital of Slovakia?
     category: geography
     answers:
-      - 'Washington DC'
-      - 'Washington D.C.'
-      - 'Washington, D.C.'
-  biggest-animal:
-    question: 'What is the largest animal in the world?'
+    - Bratislava
+  pack-geography-002:
+    question: What is the capital of Czechia?
+    category: geography
+    answers:
+    - Prague
+  pack-geography-003:
+    question: What is the capital of Austria?
+    category: geography
+    answers:
+    - Vienna
+  pack-geography-004:
+    question: What is the capital of Hungary?
+    category: geography
+    answers:
+    - Budapest
+  pack-geography-005:
+    question: What is the capital of Poland?
+    category: geography
+    answers:
+    - Warsaw
+  pack-geography-006:
+    question: What is the capital of Germany?
+    category: geography
+    answers:
+    - Berlin
+  pack-geography-007:
+    question: What is the capital of France?
+    category: geography
+    answers:
+    - Paris
+  pack-geography-008:
+    question: What is the capital of Italy?
+    category: geography
+    answers:
+    - Rome
+  pack-geography-009:
+    question: What is the capital of Spain?
+    category: geography
+    answers:
+    - Madrid
+  pack-geography-010:
+    question: What is the capital of Portugal?
+    category: geography
+    answers:
+    - Lisbon
+  pack-geography-011:
+    question: What is the capital of Ireland?
+    category: geography
+    answers:
+    - Dublin
+  pack-geography-012:
+    question: What is the capital of United Kingdom?
+    category: geography
+    answers:
+    - London
+  pack-geography-013:
+    question: What is the capital of Belgium?
+    category: geography
+    answers:
+    - Brussels
+  pack-geography-014:
+    question: What is the capital of Netherlands?
+    category: geography
+    answers:
+    - Amsterdam
+  pack-geography-015:
+    question: What is the capital of Denmark?
+    category: geography
+    answers:
+    - Copenhagen
+  pack-geography-016:
+    question: What is the capital of Norway?
+    category: geography
+    answers:
+    - Oslo
+  pack-geography-017:
+    question: What is the capital of Sweden?
+    category: geography
+    answers:
+    - Stockholm
+  pack-geography-018:
+    question: What is the capital of Finland?
+    category: geography
+    answers:
+    - Helsinki
+  pack-geography-019:
+    question: What is the capital of Iceland?
+    category: geography
+    answers:
+    - Reykjavik
+  pack-geography-020:
+    question: What is the capital of Estonia?
+    category: geography
+    answers:
+    - Tallinn
+  pack-geography-021:
+    question: What is the capital of Latvia?
+    category: geography
+    answers:
+    - Riga
+  pack-geography-022:
+    question: What is the capital of Lithuania?
+    category: geography
+    answers:
+    - Vilnius
+  pack-geography-023:
+    question: What is the capital of Belarus?
+    category: geography
+    answers:
+    - Minsk
+  pack-geography-024:
+    question: What is the capital of Ukraine?
+    category: geography
+    answers:
+    - Kyiv
+  pack-geography-025:
+    question: What is the capital of Romania?
+    category: geography
+    answers:
+    - Bucharest
+  pack-geography-026:
+    question: What is the capital of Bulgaria?
+    category: geography
+    answers:
+    - Sofia
+  pack-geography-027:
+    question: What is the capital of Greece?
+    category: geography
+    answers:
+    - Athens
+  pack-geography-028:
+    question: What is the capital of Croatia?
+    category: geography
+    answers:
+    - Zagreb
+  pack-geography-029:
+    question: What is the capital of Slovenia?
+    category: geography
+    answers:
+    - Ljubljana
+  pack-geography-030:
+    question: What is the capital of Serbia?
+    category: geography
+    answers:
+    - Belgrade
+  pack-geography-031:
+    question: What is the capital of Montenegro?
+    category: geography
+    answers:
+    - Podgorica
+  pack-geography-032:
+    question: What is the capital of Albania?
+    category: geography
+    answers:
+    - Tirana
+  pack-geography-033:
+    question: What is the capital of North Macedonia?
+    category: geography
+    answers:
+    - Skopje
+  pack-geography-034:
+    question: What is the capital of Bosnia and Herzegovina?
+    category: geography
+    answers:
+    - Sarajevo
+  pack-geography-035:
+    question: What is the capital of Malta?
+    category: geography
+    answers:
+    - Valletta
+  pack-geography-036:
+    question: What is the capital of Cyprus?
+    category: geography
+    answers:
+    - Nicosia
+  pack-geography-037:
+    question: What is the capital of Luxembourg?
+    category: geography
+    answers:
+    - Luxembourg
+  pack-geography-038:
+    question: What is the capital of Liechtenstein?
+    category: geography
+    answers:
+    - Vaduz
+  pack-geography-039:
+    question: What is the capital of Moldova?
+    category: geography
+    answers:
+    - Chisinau
+  pack-geography-040:
+    question: What is the capital of Turkey?
+    category: geography
+    answers:
+    - Ankara
+  pack-geography-041:
+    question: What is the capital of Japan?
+    category: geography
+    answers:
+    - Tokyo
+  pack-geography-042:
+    question: What is the capital of China?
+    category: geography
+    answers:
+    - Beijing
+  pack-geography-043:
+    question: What is the capital of South Korea?
+    category: geography
+    answers:
+    - Seoul
+  pack-geography-044:
+    question: What is the capital of Mongolia?
+    category: geography
+    answers:
+    - Ulaanbaatar
+  pack-geography-045:
+    question: What is the capital of Thailand?
+    category: geography
+    answers:
+    - Bangkok
+  pack-geography-046:
+    question: What is the capital of Vietnam?
+    category: geography
+    answers:
+    - Hanoi
+  pack-geography-047:
+    question: What is the capital of Philippines?
+    category: geography
+    answers:
+    - Manila
+  pack-geography-048:
+    question: What is the capital of Nepal?
+    category: geography
+    answers:
+    - Kathmandu
+  pack-geography-049:
+    question: What is the capital of Bhutan?
+    category: geography
+    answers:
+    - Thimphu
+  pack-geography-050:
+    question: What is the capital of Bangladesh?
+    category: geography
+    answers:
+    - Dhaka
+  pack-geography-051:
+    question: What is the capital of Pakistan?
+    category: geography
+    answers:
+    - Islamabad
+  pack-geography-052:
+    question: What is the capital of Afghanistan?
+    category: geography
+    answers:
+    - Kabul
+  pack-geography-053:
+    question: What is the capital of Iran?
+    category: geography
+    answers:
+    - Tehran
+  pack-geography-054:
+    question: What is the capital of Iraq?
+    category: geography
+    answers:
+    - Baghdad
+  pack-geography-055:
+    question: What is the capital of Jordan?
+    category: geography
+    answers:
+    - Amman
+  pack-geography-056:
+    question: What is the capital of Lebanon?
+    category: geography
+    answers:
+    - Beirut
+  pack-geography-057:
+    question: What is the capital of Oman?
+    category: geography
+    answers:
+    - Muscat
+  pack-geography-058:
+    question: What is the capital of Bahrain?
+    category: geography
+    answers:
+    - Manama
+  pack-geography-059:
+    question: What is the capital of Saudi Arabia?
+    category: geography
+    answers:
+    - Riyadh
+  pack-geography-060:
+    question: What is the capital of Armenia?
+    category: geography
+    answers:
+    - Yerevan
+  pack-geography-061:
+    question: What is the capital of Azerbaijan?
+    category: geography
+    answers:
+    - Baku
+  pack-geography-062:
+    question: What is the capital of Georgia?
+    category: geography
+    answers:
+    - Tbilisi
+  pack-geography-063:
+    question: What is the capital of Kazakhstan?
+    category: geography
+    answers:
+    - Astana
+  pack-geography-064:
+    question: What is the capital of Kyrgyzstan?
+    category: geography
+    answers:
+    - Bishkek
+  pack-geography-065:
+    question: What is the capital of Tajikistan?
+    category: geography
+    answers:
+    - Dushanbe
+  pack-geography-066:
+    question: What is the capital of Uzbekistan?
+    category: geography
+    answers:
+    - Tashkent
+  pack-geography-067:
+    question: What is the capital of Turkmenistan?
+    category: geography
+    answers:
+    - Ashgabat
+  pack-geography-068:
+    question: What is the capital of Laos?
+    category: geography
+    answers:
+    - Vientiane
+  pack-geography-069:
+    question: What is the capital of Egypt?
+    category: geography
+    answers:
+    - Cairo
+  pack-geography-070:
+    question: What is the capital of Morocco?
+    category: geography
+    answers:
+    - Rabat
+  pack-geography-071:
+    question: What is the capital of Algeria?
+    category: geography
+    answers:
+    - Algiers
+  pack-geography-072:
+    question: What is the capital of Tunisia?
+    category: geography
+    answers:
+    - Tunis
+  pack-geography-073:
+    question: What is the capital of Kenya?
+    category: geography
+    answers:
+    - Nairobi
+  pack-geography-074:
+    question: What is the capital of Uganda?
+    category: geography
+    answers:
+    - Kampala
+  pack-geography-075:
+    question: What is the capital of Rwanda?
+    category: geography
+    answers:
+    - Kigali
+  pack-geography-076:
+    question: What is the capital of Ghana?
+    category: geography
+    answers:
+    - Accra
+  pack-geography-077:
+    question: What is the capital of Nigeria?
+    category: geography
+    answers:
+    - Abuja
+  pack-geography-078:
+    question: What is the capital of Senegal?
+    category: geography
+    answers:
+    - Dakar
+  pack-geography-079:
+    question: What is the capital of Mali?
+    category: geography
+    answers:
+    - Bamako
+  pack-geography-080:
+    question: What is the capital of Niger?
+    category: geography
+    answers:
+    - Niamey
+  pack-general-001:
+    question: Which animal has a trunk and large ears?
     category: general
     answers:
-      - 'Blue whale'
-  minecraft-portal:
-    question: 'Which block forms the frame of a Nether portal?'
+    - Elephant
+  pack-general-002:
+    question: Which striped big cat is orange and black?
+    category: general
+    answers:
+    - Tiger
+  pack-general-003:
+    question: Which big cat is famous for the male's mane?
+    category: general
+    answers:
+    - Lion
+  pack-general-004:
+    question: Which animal has the longest neck among living animals?
+    category: general
+    answers:
+    - Giraffe
+  pack-general-005:
+    question: Which black-and-white striped animal resembles a horse?
+    category: general
+    answers:
+    - Zebra
+  pack-general-006:
+    question: Which Australian animal carries its young in a pouch and hops?
+    category: general
+    answers:
+    - Kangaroo
+  pack-general-007:
+    question: Which Australian marsupial mainly eats eucalyptus leaves?
+    category: general
+    answers:
+    - Koala
+  pack-general-008:
+    question: Which black-and-white bear mainly eats bamboo?
+    category: general
+    answers:
+    - Panda
+  pack-general-009:
+    question: Which large furry animal in Slovakia is known for sleeping in a winter den?
+    category: general
+    answers:
+    - Bear
+  pack-general-010:
+    question: Which animal builds dams with branches?
+    category: general
+    answers:
+    - Beaver
+  pack-general-011:
+    question: Which animal is famous for a bushy tail and red fur in European forests?
+    category: general
+    answers:
+    - Fox
+  pack-general-012:
+    question: Which wild canine is famous for howling in packs?
+    category: general
+    answers:
+    - Wolf
+  pack-general-013:
+    question: Which prickly garden mammal can roll into a ball?
+    category: general
+    answers:
+    - Hedgehog
+  pack-general-014:
+    question: Which animal has a shell and carries its home on its back?
+    category: general
+    answers:
+    - Snail
+  pack-general-015:
+    question: Which eight-legged animal spins webs?
+    category: general
+    answers:
+    - Spider
+  pack-general-016:
+    question: Which insect makes honey?
+    category: general
+    answers:
+    - Bee
+  pack-general-017:
+    question: Which insect changes from a caterpillar into a winged adult with broad colorful wings?
+    category: general
+    answers:
+    - Butterfly
+  pack-general-018:
+    question: Which insect is famous for carrying leaves and living in colonies?
+    category: general
+    answers:
+    - Ant
+  pack-general-019:
+    question: Which hopping insect is famous for chirping and long antennae?
+    category: general
+    answers:
+    - Cricket
+  pack-general-020:
+    question: Which insect has a long body and two pairs of wings often seen near ponds?
+    category: general
+    answers:
+    - Dragonfly
+  pack-general-021:
+    question: Which bird is famous for hooting at night?
+    category: general
+    answers:
+    - Owl
+  pack-general-022:
+    question: Which flightless bird lives naturally in Antarctica?
+    category: general
+    answers:
+    - Penguin
+  pack-general-023:
+    question: Which large flightless African bird lays the largest eggs of living birds?
+    category: general
+    answers:
+    - Ostrich
+  pack-general-024:
+    question: Which bird is famous for its colorful fan-shaped tail?
+    category: general
+    answers:
+    - Peacock
+  pack-general-025:
+    question: Which bird often mimics human speech and has a curved beak?
+    category: general
+    answers:
+    - Parrot
+  pack-general-026:
+    question: Which pink wading bird often stands on one leg?
+    category: general
+    answers:
+    - Flamingo
+  pack-general-027:
+    question: Which bird taps tree trunks with its beak?
+    category: general
+    answers:
+    - Woodpecker
+  pack-general-028:
+    question: Which farm bird says quack?
+    category: general
+    answers:
+    - Duck
+  pack-general-029:
+    question: Which farm animal says moo?
+    category: general
+    answers:
+    - Cow
+  pack-general-030:
+    question: Which farm animal says oink?
+    category: general
+    answers:
+    - Pig
+  pack-general-031:
+    question: Which farm animal is commonly shorn for wool?
+    category: general
+    answers:
+    - Sheep
+  pack-general-032:
+    question: Which farm animal is ridden and wears horseshoes?
+    category: general
+    answers:
+    - Horse
+  pack-general-033:
+    question: Which animal is often called man's best friend?
+    category: general
+    answers:
+    - Dog
+  pack-general-034:
+    question: Which pet says meow?
+    category: general
+    answers:
+    - Cat
+  pack-general-035:
+    question: Which long-eared pet is famous for hopping?
+    category: general
+    answers:
+    - Rabbit
+  pack-general-036:
+    question: Which animal has a long sticky tongue and changes its skin color?
+    category: general
+    answers:
+    - Chameleon
+  pack-general-037:
+    question: Which reptile slithers without legs?
+    category: general
+    answers:
+    - Snake
+  pack-general-038:
+    question: Which amphibian starts life as a tadpole and commonly hops as an adult?
+    category: general
+    answers:
+    - Frog
+  pack-general-039:
+    question: Which animal has eight arms and lives in the sea?
+    category: general
+    answers:
+    - Octopus
+  pack-general-040:
+    question: Which sea creature has five arms in its familiar star-shaped form?
+    category: general
+    answers:
+    - Starfish
+  pack-general-041:
+    question: Which marine mammal is famous for playful leaps and a beak-like snout?
+    category: general
+    answers:
+    - Dolphin
+  pack-general-042:
+    question: Which fish group is famous for rows of replaceable teeth and a cartilage skeleton?
+    category: general
+    answers:
+    - Shark
+  pack-general-043:
+    question: Which fish is famous for swimming upstream to spawn and has pink flesh?
+    category: general
+    answers:
+    - Salmon
+  pack-general-044:
+    question: Which floating sea animal has tentacles that can sting?
+    category: general
+    answers:
+    - Jellyfish
+  pack-general-045:
+    question: Which sea animal has a horse-shaped head and a curled tail?
+    category: general
+    answers:
+    - Seahorse
+  pack-general-046:
+    question: Which orange root vegetable is often fed to rabbits?
+    category: general
+    answers:
+    - Carrot
+  pack-general-047:
+    question: Which yellow curved fruit is peeled before eating?
+    category: general
+    answers:
+    - Banana
+  pack-general-048:
+    question: Which fruit has a prickly skin and a leafy crown?
+    category: general
+    answers:
+    - Pineapple
+  pack-general-049:
+    question: Which red fruit has seeds on the outside?
+    category: general
+    answers:
+    - Strawberry
+  pack-general-050:
+    question: Which green-fleshed fruit has a large pit and is used in guacamole?
+    category: general
+    answers:
+    - Avocado
+  pack-general-051:
+    question: Which citrus fruit is yellow and tastes sour?
+    category: general
+    answers:
+    - Lemon
+  pack-general-052:
+    question: Which citrus fruit shares its English name with a color?
+    category: general
+    answers:
+    - Orange
+  pack-general-053:
+    question: Which fruit is dried to make raisins?
+    category: general
+    answers:
+    - Grape
+  pack-general-054:
+    question: Which large fruit has green rind and usually red flesh?
+    category: general
+    answers:
+    - Watermelon
+  pack-general-055:
+    question: Which nut is used to make marzipan?
+    category: general
+    answers:
+    - Almond
+  pack-general-056:
+    question: Which bean is used to make tofu?
+    category: general
+    answers:
+    - Soybean
+  pack-general-057:
+    question: Which grain is traditionally used to make porridge in Scotland?
+    category: general
+    answers:
+    - Oats
+  pack-general-058:
+    question: Which grain is the main ingredient in traditional risotto?
+    category: general
+    answers:
+    - Rice
+  pack-general-059:
+    question: Which vegetable is used to make french fries?
+    category: general
+    answers:
+    - Potato
+  pack-general-060:
+    question: Which bulb vegetable often makes people cry when chopped?
+    category: general
+    answers:
+    - Onion
+  pack-general-061:
+    question: Which pungent bulb is commonly used to flavor garlic bread?
+    category: general
+    answers:
+    - Garlic
+  pack-general-062:
+    question: Which vegetable has green florets resembling small trees?
+    category: general
+    answers:
+    - Broccoli
+  pack-general-063:
+    question: Which orange vegetable is commonly carved for Halloween?
+    category: general
+    answers:
+    - Pumpkin
+  pack-general-064:
+    question: Which spice gives many curries a bright yellow color?
+    category: general
+    answers:
+    - Turmeric
+  pack-general-065:
+    question: Which spice is made from the bark of certain trees?
+    category: general
+    answers:
+    - Cinnamon
+  pack-general-066:
+    question: Which sweet substance do bees produce?
+    category: general
+    answers:
+    - Honey
+  pack-general-067:
+    question: What do we call water when it freezes solid?
+    category: general
+    answers:
+    - Ice
+  pack-general-068:
+    question: What do we call water in its gaseous form?
+    category: general
+    answers:
+    - Vapor
+  pack-general-069:
+    question: Which gas do humans need to breathe to survive?
+    category: general
+    answers:
+    - Oxygen
+  pack-general-070:
+    question: Which gas makes up most of Earth's atmosphere?
+    category: general
+    answers:
+    - Nitrogen
+  pack-general-071:
+    question: Which star is at the center of our solar system?
+    category: general
+    answers:
+    - Sun
+  pack-general-072:
+    question: Which planet is known as the red planet?
+    category: general
+    answers:
+    - Mars
+  pack-general-073:
+    question: Which planet is closest to the Sun?
+    category: general
+    answers:
+    - Mercury
+  pack-general-074:
+    question: Which planet is the largest in our solar system?
+    category: general
+    answers:
+    - Jupiter
+  pack-general-075:
+    question: Which planet is famous for its prominent rings?
+    category: general
+    answers:
+    - Saturn
+  pack-general-076:
+    question: Which planet do humans live on?
+    category: general
+    answers:
+    - Earth
+  pack-general-077:
+    question: What is Earth's natural satellite called?
+    category: general
+    answers:
+    - Moon
+  pack-general-078:
+    question: Which force pulls objects toward Earth?
+    category: general
+    answers:
+    - Gravity
+  pack-general-079:
+    question: Which organ pumps blood around the human body?
+    category: general
+    answers:
+    - Heart
+  pack-general-080:
+    question: Which organ controls thought and memory?
+    category: general
+    answers:
+    - Brain
+  pack-minecraft-001:
+    question: Which green hostile mob hisses before exploding?
     category: minecraft
     answers:
-      - 'Obsidian'
-
+    - Creeper
+  pack-minecraft-002:
+    question: Which undead mob is famous for firing a bow?
+    category: minecraft
+    answers:
+    - Skeleton
+  pack-minecraft-003:
+    question: Which tall black mob teleports and dislikes being stared at?
+    category: minecraft
+    answers:
+    - Enderman
+  pack-minecraft-004:
+    question: Which hostile undead mob groans and usually attacks with its hands?
+    category: minecraft
+    answers:
+    - Zombie
+  pack-minecraft-005:
+    question: Which mob attacks by throwing harmful potions?
+    category: minecraft
+    answers:
+    - Witch
+  pack-minecraft-006:
+    question: Which floating Nether mob shoots fireballs and makes crying sounds?
+    category: minecraft
+    answers:
+    - Ghast
+  pack-minecraft-007:
+    question: Which Nether mob can be bartered with using gold ingots?
+    category: minecraft
+    answers:
+    - Piglin
+  pack-minecraft-008:
+    question: Which Nether mob can be ridden across lava with a saddle?
+    category: minecraft
+    answers:
+    - Strider
+  pack-minecraft-009:
+    question: Which flying mob attacks players who have not slept for several nights?
+    category: minecraft
+    answers:
+    - Phantom
+  pack-minecraft-010:
+    question: Which blind mob is summoned by repeated sculk shrieker warnings?
+    category: minecraft
+    answers:
+    - Warden
+  pack-minecraft-011:
+    question: Which small blue helper mob collects dropped items for players?
+    category: minecraft
+    answers:
+    - Allay
+  pack-minecraft-012:
+    question: Which village resident offers trades?
+    category: minecraft
+    answers:
+    - Villager
+  pack-minecraft-013:
+    question: Which gray-skinned illager carries a crossbow during patrols?
+    category: minecraft
+    answers:
+    - Pillager
+  pack-minecraft-014:
+    question: Which flying hostile mob is summoned by an evoker?
+    category: minecraft
+    answers:
+    - Vex
+  pack-minecraft-015:
+    question: Which large beast accompanies some illager raids?
+    category: minecraft
+    answers:
+    - Ravager
+  pack-minecraft-016:
+    question: Which Nether fortress mob drops blaze rods?
+    category: minecraft
+    answers:
+    - Blaze
+  pack-minecraft-017:
+    question: Which jumping green cube mob drops slimeballs?
+    category: minecraft
+    answers:
+    - Slime
+  pack-minecraft-018:
+    question: Which hostile silver insect can hide inside infested stone blocks?
+    category: minecraft
+    answers:
+    - Silverfish
+  pack-minecraft-019:
+    question: Which underground passive mob flies and hangs upside down?
+    category: minecraft
+    answers:
+    - Bat
+  pack-minecraft-020:
+    question: Which farm mob drops wool when sheared?
+    category: minecraft
+    answers:
+    - Sheep
+  pack-minecraft-021:
+    question: Which passive farm mob lays eggs?
+    category: minecraft
+    answers:
+    - Chicken
+  pack-minecraft-022:
+    question: Which mooing farm animal can be milked with an empty bucket?
+    category: minecraft
+    answers:
+    - Cow
+  pack-minecraft-023:
+    question: Which pink farm animal can be steered with a carrot on a stick?
+    category: minecraft
+    answers:
+    - Pig
+  pack-minecraft-024:
+    question: Which tameable canine is commonly fed bones to tame it?
+    category: minecraft
+    answers:
+    - Wolf
+  pack-minecraft-025:
+    question: Which small pet scares creepers away?
+    category: minecraft
+    answers:
+    - Cat
+  pack-minecraft-026:
+    question: Which jungle bird can sit on a player's shoulder?
+    category: minecraft
+    answers:
+    - Parrot
+  pack-minecraft-027:
+    question: Which desert animal stores a dash ability and can carry two riders?
+    category: minecraft
+    answers:
+    - Camel
+  pack-minecraft-028:
+    question: Which long-necked pack animal can carry a chest and spit?
+    category: minecraft
+    answers:
+    - Llama
+  pack-minecraft-029:
+    question: Which mob carries a shell that babies drop as a scute when growing up?
+    category: minecraft
+    answers:
+    - Turtle
+  pack-minecraft-030:
+    question: Which water mob has eight tentacles and drops ink sacs?
+    category: minecraft
+    answers:
+    - Squid
+  pack-minecraft-031:
+    question: Which aquatic mammal can lead players toward underwater treasure?
+    category: minecraft
+    answers:
+    - Dolphin
+  pack-minecraft-032:
+    question: Which tropical fish inflates and can poison nearby players?
+    category: minecraft
+    answers:
+    - Pufferfish
+  pack-minecraft-033:
+    question: Which small aquatic salamander can be collected in a bucket?
+    category: minecraft
+    answers:
+    - Axolotl
+  pack-minecraft-034:
+    question: Which mob grows into a frog?
+    category: minecraft
+    answers:
+    - Tadpole
+  pack-minecraft-035:
+    question: Which hopping swamp mob can eat small slimes?
+    category: minecraft
+    answers:
+    - Frog
+  pack-minecraft-036:
+    question: Which mob can help sniff out ancient seeds?
+    category: minecraft
+    answers:
+    - Sniffer
+  pack-minecraft-037:
+    question: Which mob drops scutes used to craft wolf armor?
+    category: minecraft
+    answers:
+    - Armadillo
+  pack-minecraft-038:
+    question: Which neutral mob lives in hives and helps pollinate crops?
+    category: minecraft
+    answers:
+    - Bee
+  pack-minecraft-039:
+    question: Which mountain animal can ram players?
+    category: minecraft
+    answers:
+    - Goat
+  pack-minecraft-040:
+    question: Which black-and-white bamboo-eating mob lives in jungles?
+    category: minecraft
+    answers:
+    - Panda
+  pack-minecraft-041:
+    question: Which orange woodland animal can carry items in its mouth?
+    category: minecraft
+    answers:
+    - Fox
+  pack-minecraft-042:
+    question: Which dimension is reached through a Nether portal?
+    category: minecraft
+    answers:
+    - Nether
+  pack-minecraft-043:
+    question: Which default dimension contains villages and ordinary forests?
+    category: minecraft
+    answers:
+    - Overworld
+  pack-minecraft-044:
+    question: Which dimension contains end cities and the dragon fight?
+    category: minecraft
+    answers:
+    - End
+  pack-minecraft-045:
+    question: Which purple-black block forms a Nether portal frame?
+    category: minecraft
+    answers:
+    - Obsidian
+  pack-minecraft-046:
+    question: Which red dust is used to build circuits?
+    category: minecraft
+    answers:
+    - Redstone
+  pack-minecraft-047:
+    question: Which green gem is used in most villager trades?
+    category: minecraft
+    answers:
+    - Emerald
+  pack-minecraft-048:
+    question: Which blue gem is used to craft a diamond pickaxe?
+    category: minecraft
+    answers:
+    - Diamond
+  pack-minecraft-049:
+    question: Which high-tier material upgrades diamond gear at a smithing table?
+    category: minecraft
+    answers:
+    - Netherite
+  pack-minecraft-050:
+    question: Which metal is produced by smelting raw iron?
+    category: minecraft
+    answers:
+    - Iron
+  pack-minecraft-051:
+    question: Which metal is produced by smelting raw copper?
+    category: minecraft
+    answers:
+    - Copper
+  pack-minecraft-052:
+    question: Which yellow metal is produced by smelting raw gold?
+    category: minecraft
+    answers:
+    - Gold
+  pack-minecraft-053:
+    question: Which black fuel is commonly mined from coal ore?
+    category: minecraft
+    answers:
+    - Coal
+  pack-minecraft-054:
+    question: Which fuel can be made by smelting logs?
+    category: minecraft
+    answers:
+    - Charcoal
+  pack-minecraft-055:
+    question: Which pale mineral is commonly mined from Nether quartz ore?
+    category: minecraft
+    answers:
+    - Quartz
+  pack-minecraft-056:
+    question: Which transparent block is made by smelting sand?
+    category: minecraft
+    answers:
+    - Glass
+  pack-minecraft-057:
+    question: Which block is made by smelting cobblestone in a furnace?
+    category: minecraft
+    answers:
+    - Stone
+  pack-minecraft-058:
+    question: Which block is made when flowing water meets flowing lava?
+    category: minecraft
+    answers:
+    - Cobblestone
+  pack-minecraft-059:
+    question: Which loose yellowish block is used to make glass?
+    category: minecraft
+    answers:
+    - Sand
+  pack-minecraft-060:
+    question: Which loose block can drop flint when broken?
+    category: minecraft
+    answers:
+    - Gravel
+  pack-minecraft-061:
+    question: Which block is the source of clay balls?
+    category: minecraft
+    answers:
+    - Clay
+  pack-minecraft-062:
+    question: Which unbreakable base layer is found at the bottom of the Overworld?
+    category: minecraft
+    answers:
+    - Bedrock
+  pack-minecraft-063:
+    question: Which slippery block is made from frozen water?
+    category: minecraft
+    answers:
+    - Ice
+  pack-minecraft-064:
+    question: Which flowing hot fluid can burn players?
+    category: minecraft
+    answers:
+    - Lava
+  pack-minecraft-065:
+    question: Which fluid fills rivers and oceans?
+    category: minecraft
+    answers:
+    - Water
+  pack-minecraft-066:
+    question: Which block is used to store items and opens with a lid?
+    category: minecraft
+    answers:
+    - Chest
+  pack-minecraft-067:
+    question: Which item-storage block resembles a wooden container and can open with a solid block above
+      it?
+    category: minecraft
+    answers:
+    - Barrel
+  pack-minecraft-068:
+    question: Which block uses fuel to smelt ores and cook food?
+    category: minecraft
+    answers:
+    - Furnace
+  pack-minecraft-069:
+    question: Which block is used to repair and rename items with experience levels?
+    category: minecraft
+    answers:
+    - Anvil
+  pack-minecraft-070:
+    question: Which block transfers items into containers below it?
+    category: minecraft
+    answers:
+    - Hopper
+  pack-minecraft-071:
+    question: Which block can eject items without using them?
+    category: minecraft
+    answers:
+    - Dropper
+  pack-minecraft-072:
+    question: Which block can fire arrows and use certain items when powered?
+    category: minecraft
+    answers:
+    - Dispenser
+  pack-minecraft-073:
+    question: Which redstone block detects changes in the block in front of it?
+    category: minecraft
+    answers:
+    - Observer
+  pack-minecraft-074:
+    question: Which block moves other blocks when powered?
+    category: minecraft
+    answers:
+    - Piston
+  pack-minecraft-075:
+    question: Which redstone component delays and repeats signals?
+    category: minecraft
+    answers:
+    - Repeater
+  pack-minecraft-076:
+    question: Which redstone component can measure a container's fullness?
+    category: minecraft
+    answers:
+    - Comparator
+  pack-minecraft-077:
+    question: Which block emits a beam into the sky above a mineral pyramid?
+    category: minecraft
+    answers:
+    - Beacon
+  pack-minecraft-078:
+    question: Which underwater block grants Conduit Power when correctly activated?
+    category: minecraft
+    answers:
+    - Conduit
+  pack-minecraft-079:
+    question: Which portable light source is crafted using a stick and coal or charcoal?
+    category: minecraft
+    answers:
+    - Torch
+  pack-minecraft-080:
+    question: Which hanging light source is crafted from a torch and iron nuggets?
+    category: minecraft
+    answers:
+    - Lantern
 unscramble:
   enabled: true
-  # Percent of NON-MATH rounds using unscramble instead of trivia.
-  # With math 40 and this 50: roughly 40% math, 30% words, 30% trivia.
   chance-percent: 50
-  # One word per entry, 3–24 English letters. No spaces or punctuation.
   words:
-    - diamond
-    - creeper
-    - obsidian
-    - village
-    - redstone
-    - emerald
-    - lantern
-    - fortress
+  - diamond
+  - creeper
+  - obsidian
+  - village
+  - redstone
+  - emerald
+  - lantern
+  - fortress
+  - apple
+  - banana
+  - orange
+  - lemon
+  - cherry
+  - peach
+  - pear
+  - plum
+  - mango
+  - melon
+  - coconut
+  - pineapple
+  - avocado
+  - carrot
+  - potato
+  - tomato
+  - onion
+  - garlic
+  - pepper
+  - pumpkin
+  - broccoli
+  - spinach
+  - cabbage
+  - lettuce
+  - cucumber
+  - radish
+  - turnip
+  - beetroot
+  - mushroom
+  - almond
+  - walnut
+  - peanut
+  - hazelnut
+  - chestnut
+  - cinnamon
+  - ginger
+  - vanilla
+  - honey
+  - sugar
+  - butter
+  - cheese
+  - bread
+  - biscuit
+  - cookie
+  - pancake
+  - waffle
+  - muffin
+  - sandwich
+  - noodle
+  - pasta
+  - pizza
+  - soup
+  - salad
+  - rice
+  - wheat
+  - barley
+  - oats
+  - corn
+  - flour
+  - cereal
+  - coffee
+  - cocoa
+  - chocolate
+  - caramel
+  - candy
+  - jelly
+  - yogurt
+  - sausage
+  - bacon
+  - chicken
+  - salmon
+  - tuna
+  - trout
+  - sardine
+  - shrimp
+  - lobster
+  - crab
+  - octopus
+  - dolphin
+  - turtle
+  - penguin
+  - flamingo
+  - parrot
+  - eagle
+  - falcon
+  - hawk
+  - raven
+  - crow
+  - robin
+  - sparrow
+  - swallow
+  - pigeon
+  - dove
+  - duck
+  - goose
+  - swan
+  - turkey
+  - peacock
+  - ostrich
+  - owl
+  - woodpecker
+  - elephant
+  - giraffe
+  - zebra
+  - tiger
+  - lion
+  - leopard
+  - cheetah
+  - panther
+  - jaguar
+  - lynx
+  - bear
+  - panda
+  - koala
+  - kangaroo
+  - wallaby
+  - wombat
+  - rabbit
+  - hamster
+  - mouse
+  - rat
+  - squirrel
+  - beaver
+  - otter
+  - badger
+  - hedgehog
+  - mole
+  - bat
+  - fox
+  - wolf
+  - dog
+  - cat
+  - horse
+  - donkey
+  - mule
+  - pony
+  - cow
+  - bull
+  - calf
+  - sheep
+  - lamb
+  - goat
+  - pig
+  - boar
+  - deer
+  - moose
+  - reindeer
+  - bison
+  - buffalo
+  - camel
+  - llama
+  - alpaca
+  - monkey
+  - gorilla
+  - chimpanzee
+  - baboon
+  - lemur
+  - sloth
+  - armadillo
+  - anteater
+  - porcupine
+  - meerkat
+  - mongoose
+  - raccoon
+  - skunk
+  - weasel
+  - ferret
+  - stoat
+  - seal
+  - walrus
+  - whale
+  - shark
+  - swordfish
+  - seahorse
+  - jellyfish
+  - starfish
+  - coral
+  - sponge
+  - snake
+  - lizard
+  - gecko
+  - iguana
+  - chameleon
+  - crocodile
+  - alligator
+  - tortoise
+  - frog
+  - toad
+  - newt
+  - salamander
+  - spider
+  - scorpion
+  - butterfly
+  - moth
+  - beetle
+  - ladybird
+  - dragonfly
+  - grasshopper
+  - cricket
+  - locust
+  - ant
+  - termite
+  - bee
+  - wasp
+  - hornet
+  - mosquito
+  - fly
+  - snail
+  - slug
+  - earthworm
+  - caterpillar
+  - centipede
+  - millipede
+  - flower
+  - blossom
+  - petal
+  - pollen
+  - leaf
+  - branch
+  - trunk
+  - root
+  - bark
+  - seed
+  - acorn
+  - cone
+  - forest
+  - jungle
+  - meadow
+  - desert
+  - mountain
+  - valley
+  - canyon
+content-pack-version: 1

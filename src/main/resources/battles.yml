@@ -1,24 +1,1208 @@
-# Chat voting battles: social votes, no correct answer and no money rewards.
-# Players type 1, 2, or the full option name in ordinary chat.
+# 240 chat battles. Two choices, one vote per player, no rewards.
 battle:
   enabled: true
-  # 900 = 15 minutes after startup or the last battle ends.
   interval-seconds: 900
   duration-seconds: 45
   minimum-online-players: 2
-
-# Exactly two options per topic. Add any unique ID.
-# No immediate repeat when more than one topic is available.
 topics:
-  pets:
-    question: 'Which companion wins your heart?'
-    options: ['Cats', 'Dogs']
-  playstyle:
-    question: 'What would you rather do today?'
-    options: ['Building', 'Exploring']
-  home:
-    question: 'Where would you build your next base?'
-    options: ['Mountains', 'Ocean']
-  adventure:
-    question: 'Which trip are you taking?'
-    options: ['Nether', 'End']
+  pack-battle-01-01:
+    question: Which companion would you pick?
+    options:
+    - Cats
+    - Dogs
+  pack-battle-01-02:
+    question: Which companion would you pick?
+    options:
+    - Turtles
+    - Horses
+  pack-battle-01-03:
+    question: Which companion would you pick?
+    options:
+    - Dogs
+    - Hamsters
+  pack-battle-01-04:
+    question: Which companion would you pick?
+    options:
+    - Dogs
+    - Parrots
+  pack-battle-01-05:
+    question: Which companion would you pick?
+    options:
+    - Hamsters
+    - Horses
+  pack-battle-01-06:
+    question: Which companion would you pick?
+    options:
+    - Turtles
+    - Foxes
+  pack-battle-01-07:
+    question: Which companion would you pick?
+    options:
+    - Parrots
+    - Horses
+  pack-battle-01-08:
+    question: Which companion would you pick?
+    options:
+    - Rabbits
+    - Parrots
+  pack-battle-02-01:
+    question: Which biome would you build a base in?
+    options:
+    - Savanna
+    - Mountains
+  pack-battle-02-02:
+    question: Which biome would you build a base in?
+    options:
+    - Jungle
+    - Taiga
+  pack-battle-02-03:
+    question: Which biome would you build a base in?
+    options:
+    - Forest
+    - Taiga
+  pack-battle-02-04:
+    question: Which biome would you build a base in?
+    options:
+    - Forest
+    - Desert
+  pack-battle-02-05:
+    question: Which biome would you build a base in?
+    options:
+    - Desert
+    - Swamp
+  pack-battle-02-06:
+    question: Which biome would you build a base in?
+    options:
+    - Mountains
+    - Plains
+  pack-battle-02-07:
+    question: Which biome would you build a base in?
+    options:
+    - Jungle
+    - Swamp
+  pack-battle-02-08:
+    question: Which biome would you build a base in?
+    options:
+    - Desert
+    - Jungle
+  pack-battle-03-01:
+    question: Which building material looks better?
+    options:
+    - Quartz
+    - Deepslate
+  pack-battle-03-02:
+    question: Which building material looks better?
+    options:
+    - Stone
+    - Diorite
+  pack-battle-03-03:
+    question: Which building material looks better?
+    options:
+    - Andesite
+    - Deepslate
+  pack-battle-03-04:
+    question: Which building material looks better?
+    options:
+    - Granite
+    - Andesite
+  pack-battle-03-05:
+    question: Which building material looks better?
+    options:
+    - Quartz
+    - Granite
+  pack-battle-03-06:
+    question: Which building material looks better?
+    options:
+    - Stone
+    - Sandstone
+  pack-battle-03-07:
+    question: Which building material looks better?
+    options:
+    - Bricks
+    - Granite
+  pack-battle-03-08:
+    question: Which building material looks better?
+    options:
+    - Bricks
+    - Sandstone
+  pack-battle-04-01:
+    question: Which wood would you use for your home?
+    options:
+    - Birch
+    - Acacia
+  pack-battle-04-02:
+    question: Which wood would you use for your home?
+    options:
+    - Mangrove
+    - Bamboo
+  pack-battle-04-03:
+    question: Which wood would you use for your home?
+    options:
+    - Acacia
+    - Mangrove
+  pack-battle-04-04:
+    question: Which wood would you use for your home?
+    options:
+    - Spruce
+    - Jungle
+  pack-battle-04-05:
+    question: Which wood would you use for your home?
+    options:
+    - Mangrove
+    - Cherry
+  pack-battle-04-06:
+    question: Which wood would you use for your home?
+    options:
+    - Oak
+    - Jungle
+  pack-battle-04-07:
+    question: Which wood would you use for your home?
+    options:
+    - Birch
+    - Jungle
+  pack-battle-04-08:
+    question: Which wood would you use for your home?
+    options:
+    - Spruce
+    - Mangrove
+  pack-battle-05-01:
+    question: Which color would you paint your base?
+    options:
+    - Green
+    - Purple
+  pack-battle-05-02:
+    question: Which color would you paint your base?
+    options:
+    - Purple
+    - White
+  pack-battle-05-03:
+    question: Which color would you paint your base?
+    options:
+    - Blue
+    - Yellow
+  pack-battle-05-04:
+    question: Which color would you paint your base?
+    options:
+    - Blue
+    - Green
+  pack-battle-05-05:
+    question: Which color would you paint your base?
+    options:
+    - Yellow
+    - White
+  pack-battle-05-06:
+    question: Which color would you paint your base?
+    options:
+    - Purple
+    - Black
+  pack-battle-05-07:
+    question: Which color would you paint your base?
+    options:
+    - Red
+    - Orange
+  pack-battle-05-08:
+    question: Which color would you paint your base?
+    options:
+    - Yellow
+    - Black
+  pack-battle-06-01:
+    question: Which crop would you farm first?
+    options:
+    - Melons
+    - Bamboo
+  pack-battle-06-02:
+    question: Which crop would you farm first?
+    options:
+    - Carrots
+    - Cactus
+  pack-battle-06-03:
+    question: Which crop would you farm first?
+    options:
+    - Beetroot
+    - Bamboo
+  pack-battle-06-04:
+    question: Which crop would you farm first?
+    options:
+    - Beetroot
+    - Melons
+  pack-battle-06-05:
+    question: Which crop would you farm first?
+    options:
+    - Beetroot
+    - Pumpkins
+  pack-battle-06-06:
+    question: Which crop would you farm first?
+    options:
+    - Beetroot
+    - Cactus
+  pack-battle-06-07:
+    question: Which crop would you farm first?
+    options:
+    - Wheat
+    - Bamboo
+  pack-battle-06-08:
+    question: Which crop would you farm first?
+    options:
+    - Carrots
+    - Pumpkins
+  pack-battle-07-01:
+    question: Which meal would you choose?
+    options:
+    - Sushi
+    - Tacos
+  pack-battle-07-02:
+    question: Which meal would you choose?
+    options:
+    - Pasta
+    - Tacos
+  pack-battle-07-03:
+    question: Which meal would you choose?
+    options:
+    - Pizza
+    - Soup
+  pack-battle-07-04:
+    question: Which meal would you choose?
+    options:
+    - Soup
+    - Sushi
+  pack-battle-07-05:
+    question: Which meal would you choose?
+    options:
+    - Pizza
+    - Tacos
+  pack-battle-07-06:
+    question: Which meal would you choose?
+    options:
+    - Burgers
+    - Tacos
+  pack-battle-07-07:
+    question: Which meal would you choose?
+    options:
+    - Pizza
+    - Burgers
+  pack-battle-07-08:
+    question: Which meal would you choose?
+    options:
+    - Burgers
+    - Sushi
+  pack-battle-08-01:
+    question: Which fruit would you snack on?
+    options:
+    - Mangoes
+    - Pears
+  pack-battle-08-02:
+    question: Which fruit would you snack on?
+    options:
+    - Strawberries
+    - Pears
+  pack-battle-08-03:
+    question: Which fruit would you snack on?
+    options:
+    - Bananas
+    - Oranges
+  pack-battle-08-04:
+    question: Which fruit would you snack on?
+    options:
+    - Grapes
+    - Strawberries
+  pack-battle-08-05:
+    question: Which fruit would you snack on?
+    options:
+    - Grapes
+    - Mangoes
+  pack-battle-08-06:
+    question: Which fruit would you snack on?
+    options:
+    - Peaches
+    - Pears
+  pack-battle-08-07:
+    question: Which fruit would you snack on?
+    options:
+    - Apples
+    - Bananas
+  pack-battle-08-08:
+    question: Which fruit would you snack on?
+    options:
+    - Oranges
+    - Mangoes
+  pack-battle-09-01:
+    question: Which season is your favorite?
+    options:
+    - Autumn
+    - Winter
+  pack-battle-09-02:
+    question: Which season is your favorite?
+    options:
+    - Spring
+    - Summer
+  pack-battle-09-03:
+    question: Which season is your favorite?
+    options:
+    - Summer
+    - Winter
+  pack-battle-09-04:
+    question: Which season is your favorite?
+    options:
+    - Summer
+    - Autumn
+  pack-battle-09-05:
+    question: Which season is your favorite?
+    options:
+    - Spring
+    - Autumn
+  pack-battle-09-06:
+    question: Which season is your favorite?
+    options:
+    - Spring
+    - Winter
+  pack-battle-10-01:
+    question: Which drink would you order?
+    options:
+    - Coffee
+    - Lemonade
+  pack-battle-10-02:
+    question: Which drink would you order?
+    options:
+    - Tea
+    - Lemonade
+  pack-battle-10-03:
+    question: Which drink would you order?
+    options:
+    - Water
+    - Milk
+  pack-battle-10-04:
+    question: Which drink would you order?
+    options:
+    - Lemonade
+    - Juice
+  pack-battle-10-05:
+    question: Which drink would you order?
+    options:
+    - Water
+    - Smoothie
+  pack-battle-10-06:
+    question: Which drink would you order?
+    options:
+    - Water
+    - Lemonade
+  pack-battle-10-07:
+    question: Which drink would you order?
+    options:
+    - Water
+    - Juice
+  pack-battle-10-08:
+    question: Which drink would you order?
+    options:
+    - Coffee
+    - Milk
+  pack-battle-11-01:
+    question: Which dessert would you choose?
+    options:
+    - Brownies
+    - Muffins
+  pack-battle-11-02:
+    question: Which dessert would you choose?
+    options:
+    - Cookies
+    - Pudding
+  pack-battle-11-03:
+    question: Which dessert would you choose?
+    options:
+    - Brownies
+    - Pudding
+  pack-battle-11-04:
+    question: Which dessert would you choose?
+    options:
+    - Cake
+    - Brownies
+  pack-battle-11-05:
+    question: Which dessert would you choose?
+    options:
+    - Cake
+    - Donuts
+  pack-battle-11-06:
+    question: Which dessert would you choose?
+    options:
+    - Cake
+    - Cookies
+  pack-battle-11-07:
+    question: Which dessert would you choose?
+    options:
+    - Cookies
+    - Donuts
+  pack-battle-11-08:
+    question: Which dessert would you choose?
+    options:
+    - Pudding
+    - Muffins
+  pack-battle-12-01:
+    question: Which sport would you rather play?
+    options:
+    - Golf
+    - Rugby
+  pack-battle-12-02:
+    question: Which sport would you rather play?
+    options:
+    - Badminton
+    - Rugby
+  pack-battle-12-03:
+    question: Which sport would you rather play?
+    options:
+    - Football
+    - Volleyball
+  pack-battle-12-04:
+    question: Which sport would you rather play?
+    options:
+    - Basketball
+    - Rugby
+  pack-battle-12-05:
+    question: Which sport would you rather play?
+    options:
+    - Basketball
+    - Volleyball
+  pack-battle-12-06:
+    question: Which sport would you rather play?
+    options:
+    - Volleyball
+    - Golf
+  pack-battle-12-07:
+    question: Which sport would you rather play?
+    options:
+    - Football
+    - Tennis
+  pack-battle-12-08:
+    question: Which sport would you rather play?
+    options:
+    - Badminton
+    - Golf
+  pack-battle-13-01:
+    question: Which adventure sounds better?
+    options:
+    - Building
+    - Sailing
+  pack-battle-13-02:
+    question: Which adventure sounds better?
+    options:
+    - Exploring
+    - Trading
+  pack-battle-13-03:
+    question: Which adventure sounds better?
+    options:
+    - Fishing
+    - Climbing
+  pack-battle-13-04:
+    question: Which adventure sounds better?
+    options:
+    - Mining
+    - Sailing
+  pack-battle-13-05:
+    question: Which adventure sounds better?
+    options:
+    - Mining
+    - Building
+  pack-battle-13-06:
+    question: Which adventure sounds better?
+    options:
+    - Mining
+    - Fishing
+  pack-battle-13-07:
+    question: Which adventure sounds better?
+    options:
+    - Trading
+    - Climbing
+  pack-battle-13-08:
+    question: Which adventure sounds better?
+    options:
+    - Mining
+    - Climbing
+  pack-battle-14-01:
+    question: Which fantasy creature would you befriend?
+    options:
+    - Mermaid
+    - Dwarf
+  pack-battle-14-02:
+    question: Which fantasy creature would you befriend?
+    options:
+    - Dragon
+    - Dwarf
+  pack-battle-14-03:
+    question: Which fantasy creature would you befriend?
+    options:
+    - Phoenix
+    - Dwarf
+  pack-battle-14-04:
+    question: Which fantasy creature would you befriend?
+    options:
+    - Dragon
+    - Griffin
+  pack-battle-14-05:
+    question: Which fantasy creature would you befriend?
+    options:
+    - Fairy
+    - Dwarf
+  pack-battle-14-06:
+    question: Which fantasy creature would you befriend?
+    options:
+    - Dragon
+    - Phoenix
+  pack-battle-14-07:
+    question: Which fantasy creature would you befriend?
+    options:
+    - Fairy
+    - Elf
+  pack-battle-14-08:
+    question: Which fantasy creature would you befriend?
+    options:
+    - Mermaid
+    - Fairy
+  pack-battle-15-01:
+    question: Which base style would you build?
+    options:
+    - Farmhouse
+    - Palace
+  pack-battle-15-02:
+    question: Which base style would you build?
+    options:
+    - Tower
+    - Treehouse
+  pack-battle-15-03:
+    question: Which base style would you build?
+    options:
+    - Treehouse
+    - Fortress
+  pack-battle-15-04:
+    question: Which base style would you build?
+    options:
+    - Palace
+    - Mansion
+  pack-battle-15-05:
+    question: Which base style would you build?
+    options:
+    - Tower
+    - Fortress
+  pack-battle-15-06:
+    question: Which base style would you build?
+    options:
+    - Treehouse
+    - Farmhouse
+  pack-battle-15-07:
+    question: Which base style would you build?
+    options:
+    - Castle
+    - Fortress
+  pack-battle-15-08:
+    question: Which base style would you build?
+    options:
+    - Cottage
+    - Tower
+  pack-battle-16-01:
+    question: Which place would you explore first?
+    options:
+    - Mountains
+    - Forests
+  pack-battle-16-02:
+    question: Which place would you explore first?
+    options:
+    - Caves
+    - Oceans
+  pack-battle-16-03:
+    question: Which place would you explore first?
+    options:
+    - Forests
+    - Valleys
+  pack-battle-16-04:
+    question: Which place would you explore first?
+    options:
+    - Jungles
+    - Oceans
+  pack-battle-16-05:
+    question: Which place would you explore first?
+    options:
+    - Mountains
+    - Oceans
+  pack-battle-16-06:
+    question: Which place would you explore first?
+    options:
+    - Islands
+    - Deserts
+  pack-battle-16-07:
+    question: Which place would you explore first?
+    options:
+    - Caves
+    - Forests
+  pack-battle-16-08:
+    question: Which place would you explore first?
+    options:
+    - Mountains
+    - Jungles
+  pack-battle-17-01:
+    question: Which real animal would you like to see?
+    options:
+    - Giraffes
+    - Penguins
+  pack-battle-17-02:
+    question: Which real animal would you like to see?
+    options:
+    - Kangaroos
+    - Pandas
+  pack-battle-17-03:
+    question: Which real animal would you like to see?
+    options:
+    - Zebras
+    - Koalas
+  pack-battle-17-04:
+    question: Which real animal would you like to see?
+    options:
+    - Elephants
+    - Koalas
+  pack-battle-17-05:
+    question: Which real animal would you like to see?
+    options:
+    - Penguins
+    - Kangaroos
+  pack-battle-17-06:
+    question: Which real animal would you like to see?
+    options:
+    - Giraffes
+    - Dolphins
+  pack-battle-17-07:
+    question: Which real animal would you like to see?
+    options:
+    - Penguins
+    - Koalas
+  pack-battle-17-08:
+    question: Which real animal would you like to see?
+    options:
+    - Penguins
+    - Dolphins
+  pack-battle-18-01:
+    question: Which flower would decorate your garden?
+    options:
+    - Lilies
+    - Lavender
+  pack-battle-18-02:
+    question: Which flower would decorate your garden?
+    options:
+    - Tulips
+    - Daisies
+  pack-battle-18-03:
+    question: Which flower would decorate your garden?
+    options:
+    - Tulips
+    - Lavender
+  pack-battle-18-04:
+    question: Which flower would decorate your garden?
+    options:
+    - Orchids
+    - Poppies
+  pack-battle-18-05:
+    question: Which flower would decorate your garden?
+    options:
+    - Roses
+    - Lavender
+  pack-battle-18-06:
+    question: Which flower would decorate your garden?
+    options:
+    - Roses
+    - Sunflowers
+  pack-battle-18-07:
+    question: Which flower would decorate your garden?
+    options:
+    - Roses
+    - Daisies
+  pack-battle-18-08:
+    question: Which flower would decorate your garden?
+    options:
+    - Daisies
+    - Poppies
+  pack-battle-19-01:
+    question: Which ore would you rather find?
+    options:
+    - Diamond
+    - Gold
+  pack-battle-19-02:
+    question: Which ore would you rather find?
+    options:
+    - Gold
+    - Coal
+  pack-battle-19-03:
+    question: Which ore would you rather find?
+    options:
+    - Emerald
+    - Redstone
+  pack-battle-19-04:
+    question: Which ore would you rather find?
+    options:
+    - Iron
+    - Coal
+  pack-battle-19-05:
+    question: Which ore would you rather find?
+    options:
+    - Emerald
+    - Coal
+  pack-battle-19-06:
+    question: Which ore would you rather find?
+    options:
+    - Gold
+    - Redstone
+  pack-battle-19-07:
+    question: Which ore would you rather find?
+    options:
+    - Gold
+    - Copper
+  pack-battle-19-08:
+    question: Which ore would you rather find?
+    options:
+    - Iron
+    - Copper
+  pack-battle-20-01:
+    question: Which music instrument would you learn?
+    options:
+    - Violin
+    - Cello
+  pack-battle-20-02:
+    question: Which music instrument would you learn?
+    options:
+    - Guitar
+    - Flute
+  pack-battle-20-03:
+    question: Which music instrument would you learn?
+    options:
+    - Guitar
+    - Piano
+  pack-battle-20-04:
+    question: Which music instrument would you learn?
+    options:
+    - Saxophone
+    - Cello
+  pack-battle-20-05:
+    question: Which music instrument would you learn?
+    options:
+    - Violin
+    - Trumpet
+  pack-battle-20-06:
+    question: Which music instrument would you learn?
+    options:
+    - Flute
+    - Trumpet
+  pack-battle-20-07:
+    question: Which music instrument would you learn?
+    options:
+    - Piano
+    - Flute
+  pack-battle-20-08:
+    question: Which music instrument would you learn?
+    options:
+    - Guitar
+    - Trumpet
+  pack-battle-21-01:
+    question: Which travel method sounds better?
+    options:
+    - Flying
+    - Canoeing
+  pack-battle-21-02:
+    question: Which travel method sounds better?
+    options:
+    - Walking
+    - Hiking
+  pack-battle-21-03:
+    question: Which travel method sounds better?
+    options:
+    - Cycling
+    - Sailing
+  pack-battle-21-04:
+    question: Which travel method sounds better?
+    options:
+    - Walking
+    - Driving
+  pack-battle-21-05:
+    question: Which travel method sounds better?
+    options:
+    - Driving
+    - Hiking
+  pack-battle-21-06:
+    question: Which travel method sounds better?
+    options:
+    - Flying
+    - Riding
+  pack-battle-21-07:
+    question: Which travel method sounds better?
+    options:
+    - Walking
+    - Flying
+  pack-battle-21-08:
+    question: Which travel method sounds better?
+    options:
+    - Cycling
+    - Driving
+  pack-battle-22-01:
+    question: Which weather do you prefer?
+    options:
+    - Drizzle
+    - Clouds
+  pack-battle-22-02:
+    question: Which weather do you prefer?
+    options:
+    - Sunshine
+    - Snow
+  pack-battle-22-03:
+    question: Which weather do you prefer?
+    options:
+    - Fog
+    - Clouds
+  pack-battle-22-04:
+    question: Which weather do you prefer?
+    options:
+    - Rain
+    - Clouds
+  pack-battle-22-05:
+    question: Which weather do you prefer?
+    options:
+    - Sunshine
+    - Rain
+  pack-battle-22-06:
+    question: Which weather do you prefer?
+    options:
+    - Snow
+    - Fog
+  pack-battle-22-07:
+    question: Which weather do you prefer?
+    options:
+    - Rain
+    - Thunderstorms
+  pack-battle-22-08:
+    question: Which weather do you prefer?
+    options:
+    - Sunshine
+    - Thunderstorms
+  pack-battle-23-01:
+    question: Which hobby would you try?
+    options:
+    - Painting
+    - Reading
+  pack-battle-23-02:
+    question: Which hobby would you try?
+    options:
+    - Painting
+    - Pottery
+  pack-battle-23-03:
+    question: Which hobby would you try?
+    options:
+    - Drawing
+    - Sewing
+  pack-battle-23-04:
+    question: Which hobby would you try?
+    options:
+    - Drawing
+    - Photography
+  pack-battle-23-05:
+    question: Which hobby would you try?
+    options:
+    - Drawing
+    - Cooking
+  pack-battle-23-06:
+    question: Which hobby would you try?
+    options:
+    - Cooking
+    - Photography
+  pack-battle-23-07:
+    question: Which hobby would you try?
+    options:
+    - Gardening
+    - Sewing
+  pack-battle-23-08:
+    question: Which hobby would you try?
+    options:
+    - Gardening
+    - Pottery
+  pack-battle-24-01:
+    question: Which snack would you choose?
+    options:
+    - Popcorn
+    - Peanuts
+  pack-battle-24-02:
+    question: Which snack would you choose?
+    options:
+    - Popcorn
+    - Walnuts
+  pack-battle-24-03:
+    question: Which snack would you choose?
+    options:
+    - Walnuts
+    - Chocolate
+  pack-battle-24-04:
+    question: Which snack would you choose?
+    options:
+    - Popcorn
+    - Almonds
+  pack-battle-24-05:
+    question: Which snack would you choose?
+    options:
+    - Peanuts
+    - Almonds
+  pack-battle-24-06:
+    question: Which snack would you choose?
+    options:
+    - Peanuts
+    - Crisps
+  pack-battle-24-07:
+    question: Which snack would you choose?
+    options:
+    - Peanuts
+    - Walnuts
+  pack-battle-24-08:
+    question: Which snack would you choose?
+    options:
+    - Crackers
+    - Crisps
+  pack-battle-25-01:
+    question: Which part of a Minecraft base matters most?
+    options:
+    - Decoration
+    - Defense
+  pack-battle-25-02:
+    question: Which part of a Minecraft base matters most?
+    options:
+    - Decoration
+    - Workshops
+  pack-battle-25-03:
+    question: Which part of a Minecraft base matters most?
+    options:
+    - Decoration
+    - Gardens
+  pack-battle-25-04:
+    question: Which part of a Minecraft base matters most?
+    options:
+    - Lighting
+    - Gardens
+  pack-battle-25-05:
+    question: Which part of a Minecraft base matters most?
+    options:
+    - Lighting
+    - Workshops
+  pack-battle-25-06:
+    question: Which part of a Minecraft base matters most?
+    options:
+    - Storage
+    - Defense
+  pack-battle-25-07:
+    question: Which part of a Minecraft base matters most?
+    options:
+    - Defense
+    - Location
+  pack-battle-25-08:
+    question: Which part of a Minecraft base matters most?
+    options:
+    - Decoration
+    - Lighting
+  pack-battle-26-01:
+    question: Which Minecraft mob is more interesting?
+    options:
+    - Creeper
+    - Strider
+  pack-battle-26-02:
+    question: Which Minecraft mob is more interesting?
+    options:
+    - Warden
+    - Armadillo
+  pack-battle-26-03:
+    question: Which Minecraft mob is more interesting?
+    options:
+    - Creeper
+    - Enderman
+  pack-battle-26-04:
+    question: Which Minecraft mob is more interesting?
+    options:
+    - Enderman
+    - Axolotl
+  pack-battle-26-05:
+    question: Which Minecraft mob is more interesting?
+    options:
+    - Creeper
+    - Axolotl
+  pack-battle-26-06:
+    question: Which Minecraft mob is more interesting?
+    options:
+    - Enderman
+    - Armadillo
+  pack-battle-26-07:
+    question: Which Minecraft mob is more interesting?
+    options:
+    - Enderman
+    - Strider
+  pack-battle-26-08:
+    question: Which Minecraft mob is more interesting?
+    options:
+    - Creeper
+    - Allay
+  pack-battle-27-01:
+    question: Which community build would you help with?
+    options:
+    - Museum
+    - Station
+  pack-battle-27-02:
+    question: Which community build would you help with?
+    options:
+    - Market
+    - Theater
+  pack-battle-27-03:
+    question: Which community build would you help with?
+    options:
+    - Harbor
+    - Theater
+  pack-battle-27-04:
+    question: Which community build would you help with?
+    options:
+    - Library
+    - Arena
+  pack-battle-27-05:
+    question: Which community build would you help with?
+    options:
+    - Market
+    - Station
+  pack-battle-27-06:
+    question: Which community build would you help with?
+    options:
+    - Museum
+    - Theater
+  pack-battle-27-07:
+    question: Which community build would you help with?
+    options:
+    - Market
+    - Park
+  pack-battle-27-08:
+    question: Which community build would you help with?
+    options:
+    - Harbor
+    - Park
+  pack-battle-28-01:
+    question: Which magical power sounds more useful?
+    options:
+    - Speed
+    - Telepathy
+  pack-battle-28-02:
+    question: Which magical power sounds more useful?
+    options:
+    - Healing
+    - Shapeshifting
+  pack-battle-28-03:
+    question: Which magical power sounds more useful?
+    options:
+    - Flight
+    - Shapeshifting
+  pack-battle-28-04:
+    question: Which magical power sounds more useful?
+    options:
+    - Flight
+    - Healing
+  pack-battle-28-05:
+    question: Which magical power sounds more useful?
+    options:
+    - Healing
+    - Speed
+  pack-battle-28-06:
+    question: Which magical power sounds more useful?
+    options:
+    - Flight
+    - Speed
+  pack-battle-28-07:
+    question: Which magical power sounds more useful?
+    options:
+    - Speed
+    - Shapeshifting
+  pack-battle-28-08:
+    question: Which magical power sounds more useful?
+    options:
+    - Strength
+    - Shapeshifting
+  pack-battle-29-01:
+    question: Which story setting would you explore?
+    options:
+    - Wonderland
+    - Asgard
+  pack-battle-29-02:
+    question: Which story setting would you explore?
+    options:
+    - Space
+    - Asgard
+  pack-battle-29-03:
+    question: Which story setting would you explore?
+    options:
+    - Space
+    - Atlantis
+  pack-battle-29-04:
+    question: Which story setting would you explore?
+    options:
+    - Wonderland
+    - Narnia
+  pack-battle-29-05:
+    question: Which story setting would you explore?
+    options:
+    - Camelot
+    - Olympus
+  pack-battle-29-06:
+    question: Which story setting would you explore?
+    options:
+    - Atlantis
+    - Narnia
+  pack-battle-29-07:
+    question: Which story setting would you explore?
+    options:
+    - Space
+    - Narnia
+  pack-battle-29-08:
+    question: Which story setting would you explore?
+    options:
+    - Camelot
+    - Asgard
+  pack-battle-30-01:
+    question: Which time of day feels nicest?
+    options:
+    - Afternoon
+    - Sunset
+  pack-battle-30-02:
+    question: Which time of day feels nicest?
+    options:
+    - Noon
+    - Evening
+  pack-battle-30-03:
+    question: Which time of day feels nicest?
+    options:
+    - Sunrise
+    - Evening
+  pack-battle-30-04:
+    question: Which time of day feels nicest?
+    options:
+    - Sunrise
+    - Afternoon
+  pack-battle-30-05:
+    question: Which time of day feels nicest?
+    options:
+    - Sunrise
+    - Dawn
+  pack-battle-30-06:
+    question: Which time of day feels nicest?
+    options:
+    - Morning
+    - Sunset
+  pack-battle-30-07:
+    question: Which time of day feels nicest?
+    options:
+    - Afternoon
+    - Evening
+  pack-battle-30-08:
+    question: Which time of day feels nicest?
+    options:
+    - Sunset
+    - Dawn
+  pack-battle-bonus-01:
+    question: How would you spend a free hour?
+    options:
+    - Building
+    - Chatting
+  pack-battle-bonus-02:
+    question: Which home entrance would you choose?
+    options:
+    - Drawbridge
+    - Waterfall
+content-pack-version: 1
