@@ -53,10 +53,10 @@ Players answer in normal chat. Answers ignore capitalization and repeated spaces
 Minimal owner question:
 ```yaml
 questions:
-  biggest-animal:
-    question: 'What is the largest animal in the world?'
+  slovakia-capital:
+    question: 'What is the capital of Slovakia?'
     answers:
-      - 'Blue whale'
+      - 'Bratislava'
 ```
 
 Reward defaults to `eco give {player} 100`; `quiz.reward-display` is only its chat label. The economy command must exist and support console execution. As with welcomes, dispatch cannot prove payment, and a crash after saving a reservation can leave an unpaid winner for manual review. Failed/uncertain payments are never automatically retried. Active rounds are cancelled on reload/restart; no prior answers are replayed.

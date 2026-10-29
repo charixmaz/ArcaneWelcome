@@ -45,10 +45,17 @@ class ContentPackTest {
         assertFalse(ContentPack.merge(owner,bundled,"questions",true));
         assertFalse(owner.contains("questions.pack-general-002"));
     }
+    @Test void ownerDifficultyOnDemoIsPreserved() throws Exception {
+        var bundled=new YamlConfiguration();bundled.load(Path.of("src/main/resources/quizzes.yml").toFile());
+        var owner=new YamlConfiguration();owner.set("questions.biggest-animal.question","What is the largest animal in the world?");
+        owner.set("questions.biggest-animal.answers",List.of("Blue whale"));owner.set("questions.biggest-animal.category","general");
+        owner.set("questions.biggest-animal.difficulty","hard");ContentPack.merge(owner,bundled,"questions",true);
+        assertEquals("hard",owner.getString("questions.biggest-animal.difficulty"));
+    }
     @Test void migrationRemovesOnlyUnchangedMultiwordDemoQuestions() throws Exception {
         var bundled=new YamlConfiguration();bundled.load(Path.of("src/main/resources/quizzes.yml").toFile());
         var owner=new YamlConfiguration();owner.set("questions.biggest-animal.question","What is the largest animal in the world?");
-        owner.set("questions.biggest-animal.answers",List.of("Blue whale"));
+        owner.set("questions.biggest-animal.answers",List.of("Blue whale"));owner.set("questions.biggest-animal.category","general");
         owner.set("questions.usa-capital.question","Owner's capital question?");owner.set("questions.usa-capital.answers",List.of("Washington"));
         ContentPack.merge(owner,bundled,"questions",true);
         assertFalse(owner.contains("questions.biggest-animal"));assertTrue(owner.contains("questions.usa-capital"));

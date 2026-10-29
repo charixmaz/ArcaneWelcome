@@ -19,11 +19,14 @@ final class ContentPack {
             for(String word:bundled.getStringList("unscramble.words"))merged.putIfAbsent(word.toLowerCase(Locale.ROOT),word);
             current.set("unscramble.words",new ArrayList<>(merged.values()));
             // Remove only unchanged old demo questions that require multi-word answers.
-            if("What is the capital of the USA?".equals(current.getString("questions.usa-capital.question")) &&
-                    current.getStringList("questions.usa-capital.answers").equals(List.of("Washington DC","Washington D.C.","Washington, D.C.")))current.set("questions.usa-capital",null);
-            if("What is the largest animal in the world?".equals(current.getString("questions.biggest-animal.question")) &&
-                    current.getStringList("questions.biggest-animal.answers").equals(List.of("Blue whale")))current.set("questions.biggest-animal",null);
+            removeUnchangedDemo(current,"usa-capital","geography","What is the capital of the USA?",List.of("Washington DC","Washington D.C.","Washington, D.C."));
+            removeUnchangedDemo(current,"biggest-animal","general","What is the largest animal in the world?",List.of("Blue whale"));
         }
         current.set("content-pack-version",version);return true;
+    }
+    private static void removeUnchangedDemo(YamlConfiguration current,String id,String category,String question,List<String> answers) {
+        String path="questions."+id;
+        var entry=current.getConfigurationSection(path);
+        if(entry!=null && entry.getValues(false).equals(Map.of("question",question,"category",category,"answers",answers)))current.set(path,null);
     }
 }
