@@ -23,13 +23,14 @@ final class BattleManager {
             var result=round.finish(now,false);
             if(result!=null)results(round,result,now);
         }
-        if(active==null && settings.enabled() && now>=nextStart && Bukkit.getOnlinePlayers().size()>=settings.minimum())start(false);
+
     }
+    boolean eligible() {return settings.enabled() && !settings.topics().isEmpty() && Bukkit.getOnlinePlayers().size()>=settings.minimum();}
+    boolean automatic() {return start(false);}
     private boolean start(boolean manual) {
         if(active!=null || settings.topics().isEmpty() || !gate.acquire("battle",System.currentTimeMillis(),manual))return false;
-        var choices=settings.topics().stream().filter(t->!t.id().equals(previous)).toList();
-        if(choices.isEmpty())choices=settings.topics();
-        var topic=choices.get(ThreadLocalRandom.current().nextInt(choices.size()));previous=topic.id();
+        String id=plugin.rotate("battles",settings.topics().stream().map(BattleSettings.Topic::id).toList());
+        var topic=settings.topics().stream().filter(t->t.id().equals(id)).findFirst().orElseThrow();previous=topic.id();
         active=new BattleRound(topic.question(),topic.first(),topic.second(),System.currentTimeMillis()+settings.duration());
         plugin.quizBroadcast("battle-question",Map.of("question",topic.question(),"option1",topic.first(),"option2",topic.second(),"seconds",String.valueOf(settings.duration()/1000)));
         return true;

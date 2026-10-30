@@ -28,10 +28,10 @@ final class QuizManager {
             active=null;gate.release("quiz",now);nextStart=now+settings.interval();
             plugin.quizBroadcast("quiz-timeout",Map.of("answer",round.answer));
         }
-        if(active==null && settings.enabled() && now>=nextStart) {
-            if(Bukkit.getOnlinePlayers().size()>=settings.minimumPlayers())start(false,false);
-        }
     }
+    boolean eligible() {return settings.enabled() && Bukkit.getOnlinePlayers().size()>=settings.minimumPlayers();}
+    boolean automatic() {return start(false,false);}
+
     private boolean start(boolean manual,boolean forceUnscramble) {
         if(active!=null)return false;
         var random=ThreadLocalRandom.current();
@@ -39,15 +39,12 @@ final class QuizManager {
         if(type.equals("none") || !gate.acquire("quiz",System.currentTimeMillis(),manual))return false;
         QuizSettings.Question selected=null;
         if(type.equals("trivia")) {
-            var options=settings.questions().stream().filter(q -> !q.id().equals(previous)).toList();
-            if(options.isEmpty())options=settings.questions();
-            selected=options.get(random.nextInt(options.size()));
+            String id=plugin.rotate("trivia",settings.questions().stream().map(QuizSettings.Question::id).toList());
+            selected=settings.questions().stream().filter(q->q.id().equals(id)).findFirst().orElseThrow();
         }
         String identity;
         if(type.equals("unscramble")) {
-            var choices=settings.words().stream().filter(w->!("word:"+w).equals(previous)).toList();
-            if(choices.isEmpty())choices=settings.words();
-            String word=choices.get(random.nextInt(choices.size()));
+            String word=plugin.rotate("words",settings.words());
             identity="word:"+word;
             selected=new QuizSettings.Question(identity,Unscramble.display(Unscramble.shuffle(word,random)),List.of(word),settings.command(),settings.reward());
         } else if(selected==null) {

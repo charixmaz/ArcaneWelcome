@@ -105,3 +105,10 @@ The bundled files include **240 one-word trivia questions** (80 general knowledg
 Example: `What is the capital of Slovakia?` → `Bratislava`. The Slovak animal clue accepts `Bear`. All word puzzles use 3–24 letters with at least two distinct letters. Battle choices are opinions, with no correct answer and no money reward.
 
 Existing installations receive the pack once at startup. New question/topic IDs are added without replacing owner-customized IDs; words are merged case-insensitively. Original unchanged multiword demo questions are removed. Custom questions, categories, intervals, rewards, and battle topics remain intact. Before a file is merged, its previous contents are saved as `quizzes.yml.pre-pack-1.bak` or `battles.yml.pre-pack-1.bak`. `content-pack-version: 1` records completion, so later owner deletions are not undone on restart. After the upgrade, edit files normally and use `/arcanew reload`.
+
+## Scheduling and rotation fixes
+Automatic quizzes and voting battles now share `events.interval-seconds` in config.yml, default **1500 (25 minutes)**, measured start to start. The former quiz/battle interval settings no longer schedule separate events. Admin tests/start/skip deliberately bypass the interval, but never overlap an active event. Reload does not reset the shared countdown. Startup waits one full interval.
+
+Questions, unscramble solutions, battle topics and event types use shuffled exhaustion pools saved in `rotation.yml`: every enabled entry is drawn before its pool repeats, without immediate cycle-boundary repeats when alternatives exist. Rotation survives server restarts and reloads. Generated math still avoids immediate identical equations.
+
+New arrivals are announced and become eligible immediately after their first-join record is loaded/saved, with no 30-second timer. Welcomes typed during that brief database initialization are queued and evaluated when it completes. Existing welcome records and duplicate protection remain intact. The old welcome.delay-seconds setting is retired; newcomer windows begin at join time.

@@ -38,11 +38,20 @@ class BattleTest {
         assertEquals(100,result.percent(result.first())+result.secondPercent());
         assertEquals(0,new BattleRound.Result(0,0).secondPercent());
     }
-    @Test void eventGateBlocksOverlapAndGivesAutomaticEventsBreathingRoom() {
-        var gate=new ChatEventGate();assertTrue(gate.acquire("quiz",0,false));
-        assertFalse(gate.acquire("battle",1,true));gate.release("battle",1);assertTrue(gate.busy());
-        gate.release("quiz",100);assertFalse(gate.acquire("battle",14999,false));
-        assertTrue(gate.acquire("battle",15100,false));
-        gate.release("battle",16000);assertTrue(gate.acquire("quiz",16001,true));
+    @Test void eventGateUsesOneTwentyFiveMinuteCadence() {
+        var gate=new ChatEventGate();gate.configure(1500000,100);
+        assertFalse(gate.acquire("quiz",1499999,false));
+        assertTrue(gate.acquire("quiz",1500100,false));
+        assertFalse(gate.acquire("battle",1500101,true));
+        gate.release("quiz",1530100);
+        assertFalse(gate.acquire("battle",1530101,false));
+        assertFalse(gate.acquire("battle",3000099,false));
+        assertTrue(gate.acquire("battle",3000100,false));
+    }
+    @Test void reloadDoesNotAllowAnotherEarlyEvent() {
+        var gate=new ChatEventGate();gate.configure(1500000,0);
+        assertTrue(gate.acquire("quiz",1500000,false));gate.release("quiz",1530000);
+        gate.configure(1500000,1530010);assertFalse(gate.due(1530011));
+        assertTrue(gate.due(3000000));
     }
 }

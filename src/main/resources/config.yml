@@ -1,7 +1,7 @@
 # All times are seconds. Reload with /arcanew reload.
 # Changes apply to future arrivals; existing welcome windows keep their timestamps.
 welcome:
-  delay-seconds: 30
+  delay-seconds: 0
   duration-seconds: 300
   # Exact phrase + full username, ignoring capitalization. Optional @ is accepted.
   word: welcome
@@ -27,3 +27,7 @@ test:
   delay-seconds: 0
   # True means the test dispatches the REAL reward command.
   pay-rewards: true
+
+# One automatic quiz OR battle every 25 minutes, not separate schedules.
+events:
+  interval-seconds: 1500

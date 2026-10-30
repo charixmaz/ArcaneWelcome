@@ -30,6 +30,16 @@ public final class ArcaneWelcome extends JavaPlugin implements Listener, Command
     private final QuizManager quizzes = new QuizManager(this,chatEvents);
     private final BattleManager battles = new BattleManager(this,chatEvents);
     private YamlConfiguration messages;
+    private final ShuffleRotation rotation=new ShuffleRotation();
+    private final Map<UUID,String> pendingArrivals=new HashMap<>();
+    private final Map<UUID,List<Runnable>> pendingWelcomes=new HashMap<>();
+    String rotate(String key,List<String> pool) {
+        String result=rotation.draw(key,pool,new Random());
+        var state=new YamlConfiguration();rotation.snapshot().forEach(state::set);
+        try {state.save(new File(getDataFolder(),"rotation.yml"));}
+        catch(Exception e) {getLogger().severe("Cannot save rotation: "+e);}
+        return result;
+    }
     private record Trial(String id, String name, long starts, long ends) {}
     private record Settings(long delay, long duration, String word, String command,
                             boolean titleEnabled, long fadeIn, long stay, long fadeOut, String titleText, String subtitleText,
@@ -40,6 +50,11 @@ public final class ArcaneWelcome extends JavaPlugin implements Listener, Command
         if (!new File(getDataFolder(), "messages.yml").exists()) saveResource("messages.yml", false);
         if (!new File(getDataFolder(), "quizzes.yml").exists()) saveResource("quizzes.yml", false);
         if (!new File(getDataFolder(), "battles.yml").exists()) saveResource("battles.yml", false);
+        var rotationFile=new YamlConfiguration();
+        try {rotationFile.load(new File(getDataFolder(),"rotation.yml"));}
+        catch(java.io.FileNotFoundException ignored) {}
+        catch(Exception e) {getLogger().warning("Cannot load rotation: "+e);}
+        for(String key:rotationFile.getKeys(false))rotation.restore(key,rotationFile.getStringList(key));
         try { upgradeDefaultStyle(); upgradeContentPack("quizzes.yml","questions",true); upgradeContentPack("battles.yml","topics",false); loadSettings(); }
         catch (Exception e) { getLogger().severe("Invalid configuration: " + e.getMessage()); getServer().getPluginManager().disablePlugin(this); return; }
         // Initial open happens once before accepting events; all subsequent I/O uses the worker.
@@ -108,6 +123,10 @@ public final class ArcaneWelcome extends JavaPlugin implements Listener, Command
             }
         }
         if("&f&lWelcome".equals(config.getString("title.text"))) {config.set("title.text","&f&lWelcome {player}");configChanged=true;}
+        if(!config.getBoolean("instant-welcome-migrated",false)) {
+            config.set("welcome.delay-seconds",0);config.set("instant-welcome-migrated",true);configChanged=true;
+        }
+        if(!config.contains("events.interval-seconds")) {config.set("events.interval-seconds",1500);configChanged=true;}
         if(configChanged)config.save(configFile);
     }
     private void upgradeContentPack(String resource,String section,boolean words) throws Exception {
@@ -142,7 +161,9 @@ public final class ArcaneWelcome extends JavaPlugin implements Listener, Command
         var bundled=new YamlConfiguration();
         try(var reader=new java.io.InputStreamReader(Objects.requireNonNull(getResource("messages.yml")),java.nio.charset.StandardCharsets.UTF_8)) {bundled.load(reader);}
         m.setDefaults(bundled);
+        long eventInterval=seconds(c,"events.interval-seconds",1,86400)*1000;
         settings=candidate; messages=m;
+        chatEvents.configure(eventInterval,now());
         quizzes.configure(quizCandidate);
         battles.configure(battleCandidate);
     }
@@ -160,13 +181,23 @@ public final class ArcaneWelcome extends JavaPlugin implements Listener, Command
     private void main(Runnable action) { if(!stopping) Bukkit.getScheduler().runTask(this,() -> {if(!stopping) action.run();}); }
     @EventHandler public void join(PlayerJoinEvent e) { register(e.getPlayer(), !e.getPlayer().hasPlayedBefore()); }
     private void register(Player p,boolean first) {
-        UUID id=p.getUniqueId(); String name=p.getName(); long starts=now()+settings.delay*1000, ends=starts+settings.duration*1000;
+        UUID id=p.getUniqueId(); String name=p.getName(); long starts=now(), ends=starts+settings.duration*1000;
+        if(first)pendingArrivals.put(id,name);
         io(() -> store.join(id.toString(),name,first,starts,ends),a -> {
-            if(p.isOnline()) arrivals.put(id,a);
+            pendingArrivals.remove(id);
+            if(p.isOnline()) {
+                arrivals.put(id,a);
+                if(now()>=a.starts() && now()<a.ends() && announced.add(a.id())) {
+                    Bukkit.broadcastMessage(msg("announcement",a.name()));showWelcomeTitle(p);
+                }
+            }
+            var queued=pendingWelcomes.remove(id);
+            if(queued!=null)queued.forEach(Runnable::run);
         });
     }
+
     @EventHandler public void quit(PlayerQuitEvent e) {
-        UUID id=e.getPlayer().getUniqueId(); arrivals.remove(id); trials.remove(id); removeWelcomeTitle(id);
+        UUID id=e.getPlayer().getUniqueId(); arrivals.remove(id); pendingArrivals.remove(id);pendingWelcomes.remove(id); trials.remove(id); removeWelcomeTitle(id);
     }
     @EventHandler(priority=EventPriority.MONITOR,ignoreCancelled=true)
     public void chat(AsyncChatEvent e) {
@@ -184,9 +215,16 @@ public final class ArcaneWelcome extends JavaPlugin implements Listener, Command
     }
     private void tick() {
         long time=now();
-        // Give the oldest due event priority; the shared gate prevents overlap.
-        if(battles.nextDue()<quizzes.nextDue()) {battles.tick(time);quizzes.tick(time);}
-        else {quizzes.tick(time);battles.tick(time);}
+        quizzes.tick(time);battles.tick(time);
+        if(chatEvents.due(time)) {
+            var choices=new ArrayList<String>();
+            if(quizzes.eligible())choices.add("quiz");
+            if(battles.eligible())choices.add("battle");
+            if(!choices.isEmpty()) {
+                String type=rotate("events",choices);
+                if(type.equals("quiz"))quizzes.automatic();else battles.automatic();
+            }
+        }
         for(var entry:arrivals.entrySet()) {
             var a=entry.getValue(); Player p=Bukkit.getPlayer(entry.getKey());
             if(p!=null && time>=a.starts() && time<a.ends() && announced.add(a.id())) {
@@ -208,6 +246,14 @@ public final class ArcaneWelcome extends JavaPlugin implements Listener, Command
             claim(p,t.id,t.name,!settings.testPay); return;
         }
         var target=arrivals.values().stream().filter(a -> a.name().equalsIgnoreCase(name)).findFirst().orElse(null);
+        if(target==null) {
+            var pending=pendingArrivals.entrySet().stream().filter(e->e.getValue().equalsIgnoreCase(name)).findFirst().orElse(null);
+            if(pending!=null) {
+                var queue=pendingWelcomes.computeIfAbsent(pending.getKey(),ignored->new ArrayList<>());
+                if(queue.size()<100)queue.add(() -> welcome(id,name));
+                return;
+            }
+        }
         if(target==null || now()<target.starts() || now()>=target.ends()) {send(p,"closed",name);return;}
         if(target.id().equals(id.toString())) {send(p,"self",name);return;}
         claim(p,target.id(),target.name(),false);
